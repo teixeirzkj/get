@@ -160,7 +160,7 @@
     $("#orderAccept").checked = false;
     $("#orderSend").disabled = true;
     $("#orderSend").textContent = "Gerar pagamento";
-    $(".terms", modal).open = false;
+    termsBox.hidden = true; panel.classList.remove("has-terms");
     pane("form");
     openLayer(modal);
   }
@@ -169,6 +169,19 @@
     const t = ev.target.closest("[data-produto]"); if (t) abrirProduto(t.dataset.produto);
   });
   modal.addEventListener("click", (ev) => { if (ev.target.closest("[data-close]")) closeLayer(modal); });
+
+  /* termos: link dentro do texto de aceite abre o painel */
+  const termsBox = $("#termsBox");
+  const panel = $(".modal__panel", modal);
+  const abrirTermos = () => { panel.scrollTop = 0; panel.classList.add("has-terms"); termsBox.hidden = false; $(".terms__body", termsBox).scrollTop = 0; $("#closeTerms").focus(); };
+  const fecharTermos = () => { termsBox.hidden = true; panel.classList.remove("has-terms"); $("#openTerms").focus(); };
+  $("#openTerms").addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); abrirTermos(); });
+  $("#closeTerms").addEventListener("click", fecharTermos);
+  $("#backTerms").addEventListener("click", fecharTermos);
+  $("#acceptTerms").addEventListener("click", () => {
+    const c = $("#orderAccept"); c.checked = true; c.dispatchEvent(new Event("change"));
+    fecharTermos();
+  });
 
   $("#orderAccept").addEventListener("change", (e) => ($("#orderSend").disabled = !e.target.checked));
 
@@ -262,6 +275,7 @@
   });
 
   document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !termsBox.hidden) { fecharTermos(); return; }
     if (e.key === "Escape") { if (lb.classList.contains("is-open")) closeLayer(lb); else if (modal.classList.contains("is-open")) closeLayer(modal); }
     if (lb.classList.contains("is-open")) { if (e.key === "ArrowRight") step(1); if (e.key === "ArrowLeft") step(-1); }
   });

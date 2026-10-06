@@ -4,7 +4,7 @@
 // =====================================================================
 window.LOJA = {
   nome: "Teixeira Mods",
-  discord: "https://discord.gg/SEU-CONVITE", // ← suporte (troque pelo convite do servidor)
+  discord: "https://discord.gg/raDNQNXvD4", // suporte
 
   // Pagamento via gateway (ver pagamento.js e README.md)
   pagamento: {

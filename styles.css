@@ -228,12 +228,18 @@ button { font: inherit; color: inherit; cursor: pointer; background: none; borde
 .field { display: grid; gap: 6px; margin-bottom: 14px; font-family: var(--tech); font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
 .field select, .field input { width: 100%; height: 48px; padding: 0 14px; border-radius: var(--r); border: 1px solid var(--line-2); background: var(--bg); color: var(--text); font-family: var(--body); font-size: 16px; letter-spacing: 0; text-transform: none; }
 .field select:focus, .field input:focus { outline: none; border-color: var(--money); }
-.terms { margin: 4px 0 12px; border: 1px solid var(--line-2); border-radius: var(--r); background: var(--bg); }
-.terms summary { list-style: none; cursor: pointer; padding: 12px 14px; font-size: 14px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
-.terms summary::-webkit-details-marker { display: none; }
-.terms summary::after { content: "+"; color: var(--money); font-size: 18px; transition: transform .3s var(--ease); }
-.terms[open] summary::after { transform: rotate(45deg); }
-.terms__body { max-height: 220px; overflow: auto; padding: 0 14px 14px; font-size: 13px; color: #b5b6c6; border-top: 1px solid var(--line); }
+.link { display: inline; padding: 0; color: var(--money); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; cursor: pointer; }
+.link:hover { text-decoration-thickness: 2px; }
+
+/* painel de termos sobre a janela de compra */
+.modal__panel.has-terms { overflow: hidden; }
+.termsbox { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; background: var(--surface); animation: paneIn .3s var(--ease); }
+.termsbox[hidden] { display: none; }
+.termsbox__head { display: flex; align-items: center; justify-content: space-between; padding: 20px 28px 16px; border-bottom: 1px solid var(--line); }
+.termsbox__head .pane__title { margin: 0; }
+.termsbox__close { position: static; }
+.termsbox .terms__body { flex: 1; min-height: 0; overflow: auto; padding: 4px 28px 20px; font-size: 14px; line-height: 1.6; color: #b5b6c6; }
+.termsbox__foot { display: flex; gap: 8px; justify-content: flex-end; padding: 14px 28px; border-top: 1px solid var(--line); background: var(--bg-2); }
 .terms__body h4 { margin: 14px 0 4px; font-size: 13px; color: var(--text); }
 .terms__body p { margin: 0; }
 .accept { display: flex; gap: 10px; align-items: flex-start; margin: 0 0 14px; font-size: 13px; line-height: 1.45; color: #c8c9d6; cursor: pointer; }
@@ -319,6 +325,10 @@ button { font: inherit; color: inherit; cursor: pointer; background: none; borde
   .order__items li { padding: 5px 9px; border: 1px solid var(--line-2); font-size: 13px; }
   .order__items li::before { width: 6px; height: 6px; }
   .order__flow { padding: 22px var(--gutter) 24px; }
+  .termsbox__head, .termsbox .terms__body, .termsbox__foot { padding-left: var(--gutter); padding-right: var(--gutter); }
+  .termsbox__foot { padding-bottom: calc(14px + env(safe-area-inset-bottom)); }
+  .termsbox__foot .btn { flex: 1; }
+  .modal__panel.has-terms { height: 94svh; }
 }
 
 /* celular: pacotes 1 por linha — pacote à esquerda, descrição à direita */

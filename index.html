@@ -204,34 +204,9 @@
               <span>Seu nick</span>
               <input id="orderNick" type="text" maxlength="40" placeholder="Nick no jogo" autocomplete="off" required />
             </label>
-            <details class="terms">
-              <summary>Ler os termos de compra</summary>
-            <div class="terms__body" tabindex="0">
-              <h4>1. Objeto</h4>
-              <p>A compra dá acesso a um arquivo digital com o upgrade do plano ou pacote escolhido, acompanhado das instruções para o próprio cliente aplicá-lo e continuar seu upgrade. A compra não corresponde à contratação de uma pessoa para operar a conta do cliente.</p>
-              <h4>2. O que o cliente recebe</h4>
-              <p>Após a confirmação do pagamento, o arquivo ou link de download é enviado no mesmo momento pelo atendimento no Discord. Os arquivos podem estar hospedados em serviços externos, como Google Drive ou equivalente.</p>
-              <h4>3. Como funciona a compra</h4>
-              <p>Escolha do produto, aceite destes termos, pagamento, confirmação da transação e liberação do arquivo. O simples envio do pedido não representa pagamento aprovado.</p>
-              <h4>4. Pagamento</h4>
-              <p>O pagamento é feito por Pix, no valor apresentado no momento da compra. Pagamentos pendentes, recusados, cancelados ou expirados mantêm o arquivo bloqueado até a regularização.</p>
-              <h4>5. Natureza do produto e resultados</h4>
-              <p>Os itens listados em cada plano descrevem o conteúdo do arquivo. A aplicação depende do próprio cliente, e o resultado pode variar conforme versão do GTA, plataforma, configurações e atualizações do jogo.</p>
-              <h4>6. Riscos</h4>
-              <p>O uso de modificações no GTA Online não é permitido pelos termos da Rockstar Games e pode resultar em reset ou banimento da conta. Ao comprar, o cliente declara estar ciente e assume esse risco.</p>
-              <h4>7. Segurança dos dados</h4>
-              <p>Nunca compartilhe senha, código de autenticação, token ou cookies de sessão. A loja não solicita essas informações para enviar o arquivo.</p>
-              <h4>8. Uso pessoal</h4>
-              <p>O arquivo é de uso pessoal do comprador. Não é permitido revender, redistribuir ou publicar o material.</p>
-              <h4>9. Atualizações</h4>
-              <p>Atualizações do jogo podem alterar menus, mecânicas ou procedimentos, e algumas instruções podem exigir adaptação.</p>
-              <h4>10. Suporte</h4>
-              <p>O suporte pelo Discord orienta sobre o acesso ao arquivo, o download e dúvidas sobre o conteúdo enviado.</p>
-            </div>
-            </details>
             <label class="accept">
               <input type="checkbox" id="orderAccept" />
-              <span>Li e aceito os termos e estou ciente de que a compra dá acesso a um arquivo digital com o upgrade.</span>
+              <span>Li e aceito os <button type="button" class="link" id="openTerms">termos de compra</button> e estou ciente de que a compra dá acesso a um arquivo digital com o upgrade.</span>
             </label>
             <p class="form__error" id="formError" role="alert"></p>
             <button class="btn btn--primary btn--lg btn--block" id="orderSend" type="submit" disabled>Gerar pagamento</button>
@@ -280,6 +255,40 @@
             <p class="paid__text" id="errorText">Tente novamente em instantes.</p>
             <button type="button" class="btn btn--line btn--block" id="retryBtn">Tentar de novo</button>
           </div>
+        </div>
+      </div>
+
+      <!-- termos (sobrepõe a janela) -->
+      <div class="termsbox" id="termsBox" role="dialog" aria-modal="true" aria-labelledby="termsTitle" hidden>
+        <div class="termsbox__head">
+          <p class="pane__title" id="termsTitle">Termos de compra</p>
+          <button type="button" class="modal__close termsbox__close" id="closeTerms" aria-label="Fechar termos">×</button>
+        </div>
+        <div class="terms__body" tabindex="0">
+          <h4>1. Objeto</h4>
+          <p>A compra dá acesso a um arquivo digital com o upgrade do plano ou pacote escolhido, acompanhado das instruções para o próprio cliente aplicá-lo e continuar seu upgrade. A compra não corresponde à contratação de uma pessoa para operar a conta do cliente.</p>
+          <h4>2. O que o cliente recebe</h4>
+          <p>Após a confirmação do pagamento, o arquivo ou link de download é liberado no mesmo momento, na própria tela de compra. Os arquivos podem estar hospedados em serviços externos, como Google Drive ou equivalente.</p>
+          <h4>3. Como funciona a compra</h4>
+          <p>Escolha do produto, aceite destes termos, pagamento, confirmação da transação e liberação do arquivo. O simples envio do pedido não representa pagamento aprovado.</p>
+          <h4>4. Pagamento</h4>
+          <p>O pagamento é feito por Pix, no valor apresentado no momento da compra. Pagamentos pendentes, recusados, cancelados ou expirados mantêm o arquivo bloqueado até a regularização.</p>
+          <h4>5. Natureza do produto e resultados</h4>
+          <p>Os itens listados em cada plano descrevem o conteúdo do arquivo. A aplicação depende do próprio cliente, e o resultado pode variar conforme versão do GTA, plataforma, configurações e atualizações do jogo.</p>
+          <h4>6. Riscos</h4>
+          <p>O uso de modificações no GTA Online não é permitido pelos termos da Rockstar Games e pode resultar em reset ou banimento da conta. Ao comprar, o cliente declara estar ciente e assume esse risco.</p>
+          <h4>7. Segurança dos dados</h4>
+          <p>Nunca compartilhe senha, código de autenticação, token ou cookies de sessão. A loja não solicita essas informações para enviar o arquivo.</p>
+          <h4>8. Uso pessoal</h4>
+          <p>O arquivo é de uso pessoal do comprador. Não é permitido revender, redistribuir ou publicar o material.</p>
+          <h4>9. Atualizações</h4>
+          <p>Atualizações do jogo podem alterar menus, mecânicas ou procedimentos, e algumas instruções podem exigir adaptação.</p>
+          <h4>10. Suporte</h4>
+          <p>O suporte pelo Discord orienta sobre o acesso ao arquivo, o download e dúvidas sobre o conteúdo enviado.</p>
+        </div>
+        <div class="termsbox__foot">
+          <button type="button" class="btn btn--line" id="backTerms">Voltar</button>
+          <button type="button" class="btn btn--primary" id="acceptTerms">Li e aceito</button>
         </div>
       </div>
     </div>
