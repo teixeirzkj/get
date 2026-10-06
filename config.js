@@ -14,7 +14,7 @@ window.LOJA = {
       itens: ["30 Milhões", "Level 90", "5 Trajes Modded", "5 Carros Modded", "Corrida Modded"],
     },
     {
-      id: "basico", nome: "Plano Básico", cor: "blue", preco: null,
+      id: "basico", nome: "Plano Básico", cor: "blue", preco: 34.9,
       desc: "Uma opção equilibrada para jogadores que desejam expandir seus ganhos e desbloquear novas possibilidades.",
       itens: ["100 Milhões", "Level 150", "8 Trajes Modded", "8 Carros Modded", "Corrida Modded", "Apartamento de Luxo"],
     },
@@ -24,12 +24,12 @@ window.LOJA = {
       itens: ["200 Milhões", "Level 250", "12 Trajes Modded", "12 Carros Modded", "Corrida Modded", "Apartamentos e Empresas Principais", "Recursos Exclusivos"],
     },
     {
-      id: "mafioso", nome: "Plano Mafioso", cor: "red", preco: null,
+      id: "mafioso", nome: "Plano Mafioso", cor: "red", preco: 64.9,
       desc: "Para quem quer dominar as ruas de Los Santos com recursos avançados e uma estrutura muito mais completa.",
       itens: ["350 Milhões", "Level 400", "16 Trajes Modded", "16 Carros Modded", "Corrida Modded", "Todas as Empresas", "Grande Parte das Propriedades", "Recursos Exclusivos", "Unlocks Avançados"],
     },
     {
-      id: "elite", nome: "Plano Elite", cor: "purple", preco: null, destaque: "Completo",
+      id: "elite", nome: "Plano Elite", cor: "purple", preco: 79.9, destaque: "Completo",
       desc: "A experiência definitiva. O plano mais completo para alcançar o mais alto nível de progresso.",
       itens: ["500 Milhões", "Todas as Propriedades", "Level Opcional", "Unlock All", "Recursos Exclusivos", "20 Trajes Modded", "20 Carros Modded", "Corrida Modded"],
     },
@@ -80,18 +80,4 @@ window.LOJA = {
     { user: "michz7278", texto: null, produto: null, data: "31/12/2025" },
   ],
 
-  faq: [
-    { q: "Como funciona a entrega?",
-      a: "A entrega é manual, feita direto na sua conta. Depois da compra você abre um ticket no Discord, informa plataforma e pacote, e o atendimento combina com você como e quando a entrega acontece. Ao final você recebe o cargo @CLIENTE." },
-    { q: "Quais plataformas são atendidas?",
-      a: "Já realizamos entregas em Steam, Epic Games, Rockstar Launcher, Xbox App (PC), Xbox e PS5. Confirme a sua no atendimento antes de pagar." },
-    { q: "Quanto tempo demora?",
-      a: "Depende do pacote e da fila de atendimento. O prazo é informado no ticket antes do pagamento." },
-    { q: "Minha conta corre algum risco?",
-      a: "Sim, existe risco. Dinheiro, level e itens modded não são permitidos pelos termos da Rockstar, e contas modificadas podem sofrer reset ou banimento. A Rockstar pode agir a qualquer momento e isso foge do nosso controle. Avalie esse risco antes de comprar." },
-    { q: "Preciso passar minha senha?",
-      a: "O formato de acesso é combinado no atendimento. Se em algum momento você compartilhar dados de acesso, troque sua senha e reative a verificação em duas etapas assim que a entrega for concluída." },
-    { q: "Posso montar um pacote personalizado?",
-      a: "Pode. Chame no Discord dizendo quanto de dinheiro, level, carros e trajes você quer e montamos um orçamento." },
-  ],
 };

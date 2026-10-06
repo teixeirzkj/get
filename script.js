@@ -103,14 +103,6 @@
     </article>`;
   $("#reviews").innerHTML = L.avaliacoes.map((r, i) => reviewHTML(r, i)).join("") + L.avaliacoes.map((r, i) => reviewHTML(r, i, true)).join("");
 
-  /* ---------- faq ---------- */
-  $("#faqList").innerHTML = L.faq.map((f, i) => `
-    <details class="reveal" style="--d:${i * 0.05}s"><summary>${esc(f.q)}</summary><div class="faq__a"><p>${esc(f.a)}</p></div></details>`).join("");
-  $("#faqList").addEventListener("toggle", (e) => {
-    if (!e.target.open) return;
-    $$("#faqList details").forEach((d) => d !== e.target && (d.open = false));
-  }, true);
-
   /* ---------- modal / pedido ---------- */
   const modal = $("#orderModal");
   let pedido = null;
@@ -140,12 +132,17 @@
     }
     $("#orderTitle").textContent = pedido.nome;
     $("#orderPrice").textContent = pedido.preco != null ? `${brl(pedido.preco)} · Pix` : "Valor sob consulta";
+    $("#orderAccept").checked = false;
+    $("#orderSend").disabled = true;
     $("#orderItems").innerHTML = pedido.itens.map((i) => `<li>${esc(i)}</li>`).join("");
     openLayer(modal);
   });
   modal.addEventListener("click", (ev) => { if (ev.target.closest("[data-close]")) closeLayer(modal); });
 
+  $("#orderAccept").addEventListener("change", (e) => ($("#orderSend").disabled = !e.target.checked));
+
   $("#orderSend").addEventListener("click", async () => {
+    if (!$("#orderAccept").checked) return;
     const plat = $("#orderPlatform").value;
     const nick = $("#orderNick").value.trim();
     const msg = [
@@ -155,6 +152,7 @@
       `🎮 Plataforma: ${plat}`,
       nick ? `👤 Discord: ${nick}` : null,
       `✅ Itens: ${pedido.itens.join(", ")}`,
+      "📄 Termos de compra aceitos",
     ].filter(Boolean).join("\n");
     let copied = false;
     try { await navigator.clipboard.writeText(msg); copied = true; } catch (_) {}

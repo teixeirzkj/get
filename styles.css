@@ -370,3 +370,17 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .reviews { width: auto; flex-wrap: wrap; justify-content: center; }
   .reviews .review[data-clone] { display: none; }
 }
+
+/* ---------- termos no checkout ---------- */
+.terms { margin: 4px 0 12px; border: 1px solid var(--line-2); border-radius: 12px; background: #0b0b13; }
+.terms summary { list-style: none; cursor: pointer; padding: 12px 14px; font-size: 14px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+.terms summary::-webkit-details-marker { display: none; }
+.terms summary::after { content: "+"; color: var(--money); font-size: 18px; transition: transform .3s var(--ease); }
+.terms[open] summary::after { transform: rotate(45deg); }
+.terms__body { max-height: 240px; overflow: auto; padding: 0 14px 14px; font-size: 13px; color: #b9bacb; border-top: 1px solid var(--line); }
+.terms__body h4 { margin: 14px 0 4px; font-size: 13px; color: var(--text); }
+.terms__body p { margin: 0; }
+.accept { display: flex; gap: 10px; align-items: flex-start; margin: 0 0 16px; font-size: 13px; line-height: 1.45; color: #c8c9d6; cursor: pointer; }
+.accept input { flex: none; width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--money); cursor: pointer; }
+.btn:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn:disabled::after { display: none; }
