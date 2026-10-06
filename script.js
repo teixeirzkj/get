@@ -1,6 +1,5 @@
 (() => {
   const L = window.LOJA;
-  const Pay = window.Pagamento;
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -133,19 +132,14 @@
     el.classList.remove("is-open"); el.setAttribute("aria-hidden", "true");
     document.documentElement.classList.remove("is-locked");
     lastFocus && lastFocus.focus({ preventScroll: true });
-    if (el === modal) pararStatus();
   }
 
   /* =========================================================
-     CHECKOUT
+     CHECKOUT (Kiwify)
      ========================================================= */
   const modal = $("#orderModal");
   const form = $("#orderForm");
-  let atual = null;     // produto aberto
-  let cobranca = null;  // pagamento gerado
-  let poll = null, timer = null;
-
-  const pane = (name) => $$(".pane", modal).forEach((p) => p.classList.toggle("is-active", p.dataset.pane === name));
+  let atual = null; // produto aberto
 
   function abrirProduto(id) {
     const p = produtos[id]; if (!p) return;
@@ -159,9 +153,8 @@
     $("#formError").textContent = "";
     $("#orderAccept").checked = false;
     $("#orderSend").disabled = true;
-    $("#orderSend").textContent = "Gerar pagamento";
+    $("#orderSend").textContent = "Ir para o pagamento";
     termsBox.hidden = true; panel.classList.remove("has-terms");
-    pane("form");
     openLayer(modal);
   }
 
@@ -185,7 +178,7 @@
 
   $("#orderAccept").addEventListener("change", (e) => ($("#orderSend").disabled = !e.target.checked));
 
-  form.addEventListener("submit", async (ev) => {
+  form.addEventListener("submit", (ev) => {
     ev.preventDefault();
     const plataforma = $("#orderPlatform").value;
     const nick = $("#orderNick").value.trim();
@@ -193,91 +186,20 @@
     if (!plataforma) { err.textContent = "Selecione a sua plataforma."; $("#orderPlatform").focus(); return; }
     if (nick.length < 2) { err.textContent = "Informe o seu nick."; $("#orderNick").focus(); return; }
     if (!$("#orderAccept").checked) { err.textContent = "Aceite os termos para continuar."; return; }
+
+    const link = (L.kiwify || {})[atual.id];
+    if (!link) { err.textContent = "O pagamento deste pacote ainda não está disponível. Chame o suporte no Discord."; return; }
     err.textContent = "";
 
+    // plataforma e nick vão como parâmetro de rastreio (src) para aparecer na venda
+    let url;
+    try { url = new URL(link); } catch (_) { err.textContent = "Link de pagamento inválido. Chame o suporte."; return; }
+    url.searchParams.set("src", `${plataforma} | ${nick}`.slice(0, 80));
+
     const btn = $("#orderSend");
-    btn.disabled = true; btn.textContent = "Gerando Pix…";
-    try {
-      cobranca = await Pay.criar({ produto: atual.id, plataforma, nick, aceiteTermos: true });
-      await mostrarPix(cobranca);
-      pane("pix");
-      iniciarStatus();
-    } catch (e) {
-      mostrarErro("Não foi possível gerar o pagamento", e.message && !/^HTTP/.test(e.message) ? e.message : "O pagamento está indisponível no momento. Tente novamente em instantes.");
-    } finally {
-      btn.disabled = !$("#orderAccept").checked; btn.textContent = "Gerar pagamento";
-    }
-  });
-
-  async function mostrarPix(c) {
-    $("#pixAmount").textContent = brl(c.valor != null ? c.valor : atual.preco);
-    $("#pixCode").value = c.copiaECola || "";
-    const box = $("#pixQr");
-    if (c.qrCodeBase64) {
-      const src = c.qrCodeBase64.startsWith("data:") ? c.qrCodeBase64 : `data:image/png;base64,${c.qrCodeBase64}`;
-      box.innerHTML = `<img src="${src}" alt="QR Code Pix" />`;
-    } else if (c.copiaECola) {
-      box.innerHTML = "";
-      try { await loadQrLib(); new window.QRCode(box, { text: c.copiaECola, width: 200, height: 200, correctLevel: window.QRCode.CorrectLevel.M }); }
-      catch (_) { box.innerHTML = `<span class="pix__noqr">Use o código copia e cola</span>`; }
-    }
-    clearInterval(timer);
-    const fim = c.expiraEm ? new Date(c.expiraEm).getTime() : null;
-    const tick = () => {
-      if (!fim) { $("#pixTimer").textContent = ""; return; }
-      const s = Math.max(0, Math.round((fim - Date.now()) / 1000));
-      $("#pixTimer").textContent = `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
-      if (s === 0) { pararStatus(); mostrarErro("Pix expirado", "O tempo para pagamento acabou. Gere um novo Pix."); }
-    };
-    tick(); timer = setInterval(tick, 1000);
-  }
-
-  let qrLib;
-  function loadQrLib() {
-    if (window.QRCode) return Promise.resolve();
-    return (qrLib ||= new Promise((ok, fail) => {
-      const s = document.createElement("script");
-      s.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
-      s.onload = ok; s.onerror = fail; document.head.appendChild(s);
-    }));
-  }
-
-  function iniciarStatus() {
-    pararStatus(false);
-    poll = setInterval(async () => {
-      try {
-        const r = await Pay.status(cobranca.id, atual.id);
-        if (r.status === "paid") {
-          pararStatus();
-          const a = $("#downloadBtn");
-          if (r.downloadUrl) {
-            a.href = r.downloadUrl; a.hidden = false;
-            $(".paid__text", modal).textContent = "Seu arquivo com todo o upgrade está pronto.";
-          } else {
-            a.hidden = true;
-            $(".paid__text", modal).textContent = "Pagamento recebido! Chame o suporte no Discord para receber seu arquivo.";
-          }
-          pane("paid");
-        } else if (r.status === "expired") {
-          pararStatus();
-          mostrarErro("Pix expirado", "O tempo para pagamento acabou. Gere um novo Pix.");
-        }
-      } catch (_) { /* tenta de novo no próximo ciclo */ }
-    }, Pay.intervalo);
-  }
-  function pararStatus(limparTimer = true) {
-    clearInterval(poll); poll = null;
-    if (limparTimer) clearInterval(timer);
-  }
-  function mostrarErro(t, m) { $("#errorTitle").textContent = t; $("#errorText").textContent = m; pane("error"); }
-  $("#retryBtn").addEventListener("click", () => pane("form"));
-
-  $("#pixCopy").addEventListener("click", async () => {
-    const v = $("#pixCode").value; if (!v) return;
-    try { await navigator.clipboard.writeText(v); } catch (_) { $("#pixCode").select(); document.execCommand("copy"); }
-    $("#pixCopy").textContent = "Copiado";
-    setTimeout(() => ($("#pixCopy").textContent = "Copiar"), 2000);
-    toast("Código Pix copiado");
+    btn.disabled = true; btn.textContent = "Abrindo checkout…";
+    window.location.href = url.toString();
+    setTimeout(() => { btn.disabled = false; btn.textContent = "Ir para o pagamento"; }, 4000);
   });
 
   document.addEventListener("keydown", (e) => {
@@ -332,5 +254,4 @@
   }, { threshold: 0.1, rootMargin: "0px 0px -30px 0px" });
   $$(".reveal, .step").forEach((el) => io.observe(el));
 
-  if (Pay.demo) toast("Modo demonstração de pagamento ativo");
 })();

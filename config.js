@@ -6,10 +6,17 @@ window.LOJA = {
   nome: "Teixeira Mods",
   discord: "https://discord.gg/CtW7Us5WNz", // suporte
 
-  // Pagamento via gateway (ver pagamento.js e README.md)
-  pagamento: {
-    endpoint: "/api/pagamento", // POST cria o Pix · GET ?id= consulta o status
-    intervaloStatus: 4000,      // ms entre cada consulta de status
+  // Links de checkout da Kiwify, um por pacote (Kiwify → Produtos → Links).
+  // Pacote sem link mostra "pagamento ainda não disponível".
+  kiwify: {
+    "iniciante": "",
+    "basico": "",
+    "executivo": "",
+    "mafioso": "",
+    "elite": "",
+    "trajes-5": "",
+    "trajes-10": "",
+    "trajes-20": "",
   },
 
   planos: [

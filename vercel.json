@@ -10,11 +10,5 @@
         }
       ]
     }
-  ],
-  "functions": {
-    "api/*.js": {
-      "includeFiles": "config.js",
-      "maxDuration": 10
-    }
-  }
+  ]
 }
