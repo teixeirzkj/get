@@ -4,8 +4,13 @@
 // =====================================================================
 window.LOJA = {
   nome: "Teixeira Mods",
-  discord: "https://discord.gg/SEU-CONVITE", // ← troque pelo convite do servidor
-  whatsapp: null, // ex.: "https://wa.me/5511999999999" (opcional)
+  discord: "https://discord.gg/SEU-CONVITE", // ← suporte (troque pelo convite do servidor)
+
+  // Pagamento via gateway (ver pagamento.js e README.md)
+  pagamento: {
+    endpoint: "/api/pagamento", // POST cria o Pix · GET ?id= consulta o status
+    intervaloStatus: 4000,      // ms entre cada consulta de status
+  },
 
   planos: [
     {
@@ -66,7 +71,6 @@ window.LOJA = {
     { img: 6, plataforma: "Steam", pacote: "Carros Modded", nivel: 219, dinheiro: "33 Mi", data: null },
     { img: 26, plataforma: "Xbox", pacote: "Dinheiro PC", nivel: null, dinheiro: "50 Mi", data: "16/01/2026" },
     { img: 12, plataforma: "Steam", pacote: "Dinheiro + Level", nivel: 38, dinheiro: "51 Mi", data: "03/01/2026" },
-    { img: 19, plataforma: "Steam", pacote: "Personalizado", nivel: null, dinheiro: "15 Mi", data: "08/01/2026" },
   ],
 
   // Avaliações reais do canal do Discord
