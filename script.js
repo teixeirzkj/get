@@ -135,7 +135,7 @@
   }
 
   /* =========================================================
-     CHECKOUT (Kiwify)
+     PEDIDO (Discord) — trocar pelo gateway quando o pagamento for configurado
      ========================================================= */
   const modal = $("#orderModal");
   const form = $("#orderForm");
@@ -153,7 +153,7 @@
     $("#formError").textContent = "";
     $("#orderAccept").checked = false;
     $("#orderSend").disabled = true;
-    $("#orderSend").textContent = "Ir para o pagamento";
+    $("#orderSend").textContent = "Chamar no Discord";
     termsBox.hidden = true; panel.classList.remove("has-terms");
     openLayer(modal);
   }
@@ -178,7 +178,7 @@
 
   $("#orderAccept").addEventListener("change", (e) => ($("#orderSend").disabled = !e.target.checked));
 
-  form.addEventListener("submit", (ev) => {
+  form.addEventListener("submit", async (ev) => {
     ev.preventDefault();
     const plataforma = $("#orderPlatform").value;
     const nick = $("#orderNick").value.trim();
@@ -187,19 +187,24 @@
     if (nick.length < 2) { err.textContent = "Informe o seu nick."; $("#orderNick").focus(); return; }
     if (!$("#orderAccept").checked) { err.textContent = "Aceite os termos para continuar."; return; }
 
-    const link = (L.kiwify || {})[atual.id];
-    if (!link) { err.textContent = "O pagamento deste pacote ainda não está disponível. Chame o suporte no Discord."; return; }
     err.textContent = "";
 
-    // plataforma e nick vão como parâmetro de rastreio (src) para aparecer na venda
-    let url;
-    try { url = new URL(link); } catch (_) { err.textContent = "Link de pagamento inválido. Chame o suporte."; return; }
-    url.searchParams.set("src", `${plataforma} | ${nick}`.slice(0, 80));
+    const msg = [
+      "🚀 Novo pedido — Teixeira Mods",
+      `📦 Pacote: ${atual.titulo}`,
+      `💵 Valor: ${atual.preco != null ? brl(atual.preco) : "a consultar"}`,
+      `🎮 Plataforma: ${plataforma}`,
+      `👤 Nick: ${nick}`,
+      "📄 Termos de compra aceitos",
+    ].join("\n");
 
-    const btn = $("#orderSend");
-    btn.disabled = true; btn.textContent = "Abrindo checkout…";
-    window.location.href = url.toString();
-    setTimeout(() => { btn.disabled = false; btn.textContent = "Ir para o pagamento"; }, 4000);
+    // copia primeiro (a aba nova tira o foco e bloquearia a área de transferência)
+    let copiado = false;
+    try { await navigator.clipboard.writeText(msg); copiado = true; } catch (_) {}
+    const aba = window.open(L.discord, "_blank");
+    if (aba) aba.opener = null; else window.location.href = L.discord;
+    toast(copiado ? "Pedido copiado! Cole no Discord." : "Abra o Discord e informe seu pedido.");
+    closeLayer(modal);
   });
 
   document.addEventListener("keydown", (e) => {

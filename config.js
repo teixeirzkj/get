@@ -6,19 +6,6 @@ window.LOJA = {
   nome: "Teixeira Mods",
   discord: "https://discord.gg/CtW7Us5WNz", // suporte
 
-  // Links de checkout da Kiwify, um por pacote (Kiwify → Produtos → Links).
-  // Pacote sem link mostra "pagamento ainda não disponível".
-  kiwify: {
-    "iniciante": "",
-    "basico": "",
-    "executivo": "",
-    "mafioso": "",
-    "elite": "",
-    "trajes-5": "",
-    "trajes-10": "",
-    "trajes-20": "",
-  },
-
   planos: [
     {
       id: "iniciante", nome: "Plano Iniciante", cor: "green", preco: 24.9,
