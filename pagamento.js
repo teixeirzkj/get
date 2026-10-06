@@ -1,7 +1,7 @@
 // =====================================================================
 //  CLIENTE DE PAGAMENTO (Pix via gateway)
 //
-//  O site conversa só com a SUA API (LOJA.pagamento.endpoint). A API é
+//  Gateway: EvoPay (implementado em /api). O site conversa só com a SUA API (LOJA.pagamento.endpoint). A API é
 //  quem fala com o gateway, guarda a chave secreta e decide o preço pelo
 //  id do produto. Contrato esperado:
 //
@@ -9,7 +9,7 @@
 //    body: { produto, plataforma, nick, aceiteTermos: true }
 //    200 → { id, copiaECola, qrCodeBase64?, valor?, expiraEm? (ISO) }
 //
-//  GET /api/pagamento?id=<id>
+//  GET /api/pagamento?id=<id>&produto=<produto>
 //    200 → { status: "pending" | "paid" | "expired", downloadUrl? }
 //    (downloadUrl só deve vir quando status === "paid")
 //
@@ -47,7 +47,7 @@ window.Pagamento = (() => {
 
   const api = {
     criar: (payload) => req(cfg.endpoint, { method: "POST", body: JSON.stringify(payload) }),
-    status: (id) => req(`${cfg.endpoint}?id=${encodeURIComponent(id)}`, { method: "GET" }),
+    status: (id, produto) => req(`${cfg.endpoint}?id=${encodeURIComponent(id)}&produto=${encodeURIComponent(produto)}`, { method: "GET" }),
   };
 
   return { demo, ...(demo ? demoApi : api), intervalo: cfg.intervaloStatus || 4000 };

@@ -246,11 +246,17 @@
     pararStatus(false);
     poll = setInterval(async () => {
       try {
-        const r = await Pay.status(cobranca.id);
+        const r = await Pay.status(cobranca.id, atual.id);
         if (r.status === "paid") {
           pararStatus();
           const a = $("#downloadBtn");
-          a.href = r.downloadUrl || "#";
+          if (r.downloadUrl) {
+            a.href = r.downloadUrl; a.hidden = false;
+            $(".paid__text", modal).textContent = "Seu arquivo com todo o upgrade está pronto.";
+          } else {
+            a.hidden = true;
+            $(".paid__text", modal).textContent = "Pagamento recebido! Chame o suporte no Discord para receber seu arquivo.";
+          }
           pane("paid");
         } else if (r.status === "expired") {
           pararStatus();
