@@ -77,7 +77,7 @@ async function consultar(req, res) {
   if (tx.status === "paid") {
     // confere se o valor pago é o do produto
     if (!mesmoValor(valorDe(tx.amount), item.preco)) return res.status(403).json({ erro: "Pagamento não corresponde ao produto." });
-    return res.status(200).json({ status: "paid", downloadUrl: linkDownload(produto) });
+    return res.status(200).json({ status: "paid", downloadUrl: linkDownload(produto, id) });
   }
   if (tx.status === "expired" || tx.status === "cancelled") return res.status(200).json({ status: "expired" });
   return res.status(200).json({ status: "pending" });

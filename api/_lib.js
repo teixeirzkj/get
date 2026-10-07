@@ -9,7 +9,7 @@ const CASHINPAY = "https://api.cashinpaybr.com/api/v1";
 let catalogo;
 function produtos() {
   if (catalogo) return catalogo;
-  const src = fs.readFileSync(path.join(process.cwd(), "config.js"), "utf8");
+  const src = fs.readFileSync(path.join(process.cwd(), "public", "config.js"), "utf8");
   const ctx = { window: {} };
   vm.runInNewContext(src, ctx);
   const L = ctx.window.LOJA;
@@ -47,12 +47,28 @@ function produtoDoId(id) {
   return m ? m[1] : null;
 }
 
-// Links de download por produto: variável DOWNLOADS = {"iniciante":"https://...", ...}
-function linkDownload(id) {
+// Arquivos privados: pasta /arquivos na raiz (fora de /public, então o site não os serve).
+// Nome do arquivo = id do pacote + extensão. Ex.: arquivos/executivo.zip
+const PASTA = path.join(process.cwd(), "arquivos");
+function arquivoDoProduto(id) {
+  try {
+    const nome = fs.readdirSync(PASTA).find((f) => f.toLowerCase().startsWith(id + "."));
+    return nome ? { nome, caminho: path.join(PASTA, nome) } : null;
+  } catch (_) { return null; }
+}
+
+// Opcional, para arquivos grandes: variável DOWNLOADS = {"iniciante":"https://...", ...}
+function linkExterno(id) {
   try { return JSON.parse(process.env.DOWNLOADS || "{}")[id] || null; } catch (_) { return null; }
+}
+
+// Link que o cliente recebe depois do pagamento
+function linkDownload(produto, txId) {
+  if (arquivoDoProduto(produto)) return `/api/download?id=${encodeURIComponent(txId)}`;
+  return linkExterno(produto);
 }
 
 const mesmoValor = (a, b) => Math.abs(Number(a) - Number(b)) < 0.005;
 const valorDe = (amount) => (amount && typeof amount === "object" ? amount.value : amount);
 
-module.exports = { produtos, cashinpay, novoId, produtoDoId, linkDownload, mesmoValor, valorDe };
+module.exports = { produtos, cashinpay, novoId, produtoDoId, arquivoDoProduto, linkDownload, mesmoValor, valorDe };

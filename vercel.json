@@ -13,8 +13,9 @@
   ],
   "functions": {
     "api/*.js": {
-      "includeFiles": "config.js",
+      "includeFiles": "{public/config.js,arquivos/**}",
       "maxDuration": 30
     }
-  }
+  },
+  "outputDirectory": "public"
 }
