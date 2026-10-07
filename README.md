@@ -1,18 +1,19 @@
 # Teixeira Mods — site
 
-Site estático em `public/` + funções da Vercel em `api/` (pagamento Pix CashinPay e download protegido).
+Loja de guias em PDF de progressão para GTA Online. Site estático em `public/` + funções da Vercel em `api/` (pagamento Pix CashinPay e download protegido).
+
+> Os guias são produtos educativos: o site não promete nem entrega dinheiro, level ou itens na conta. Mantenha os textos de `public/config.js` coerentes com o conteúdo real dos PDFs (CDC arts. 30, 31 e 37).
 Deploy na Vercel (Framework: **Other**; o `vercel.json` já define `public` como pasta do site).
 
 ## Editar conteúdo
-Tudo em `public/config.js`: link de suporte (`discord`), planos e preços, trajes, prints e avaliações.
-Prints: `public/assets/entregas/eN.webp` (+ `eN-thumb.webp`).
+Tudo em `public/config.js`: link de suporte (`discord`), guias, preços e trajes.
 
 ## Arquivos dos pacotes
-Coloque o arquivo de cada pacote na pasta **`arquivos/`** (na raiz, fora de `public/`), com o nome igual ao id do pacote:
+Coloque o guia (PDF) de cada pacote na pasta **`arquivos/`** (na raiz, fora de `public/`), com o nome igual ao id do pacote:
 
 ```
-arquivos/iniciante.zip   arquivos/basico.zip   arquivos/executivo.zip   arquivos/mafioso.zip
-arquivos/elite.zip       arquivos/trajes-5.zip arquivos/trajes-10.zip   arquivos/trajes-20.zip
+arquivos/iniciante.pdf   arquivos/basico.pdf   arquivos/executivo.pdf   arquivos/mafioso.pdf
+arquivos/elite.pdf       arquivos/trajes-5.pdf arquivos/trajes-10.pdf   arquivos/trajes-20.pdf
 ```
 
 - A pasta **não é pública**: o arquivo só sai por `/api/download?id=...`, que confere na CashinPay se o Pix foi pago e se o valor é o do pacote.

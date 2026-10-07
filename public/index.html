@@ -4,12 +4,11 @@
   <script>document.documentElement.className = "js";</script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Teixeira Mods — Upgrade GTA Online</title>
-  <meta name="description" content="Planos de upgrade para GTA Online: dinheiro, level, carros e trajes modded. Pague no Pix e baixe o arquivo com todo o upgrade na hora. Steam, Epic, Rockstar, Xbox e PS5." />
+  <title>Teixeira Mods — Guias GTA Online</title>
+  <meta name="description" content="Guias em PDF de progressão para GTA Online: rota para juntar dinheiro, subir de level e montar carros e trajes, usando só o próprio jogo. Pague no Pix e baixe na hora." />
   <meta name="theme-color" content="#08080d" />
-  <meta property="og:title" content="Teixeira Mods — Upgrade GTA Online" />
-  <meta property="og:description" content="Dinheiro, level, carros e trajes modded. Pague no Pix e baixe o arquivo na hora." />
-  <meta property="og:image" content="/assets/entregas/e23.webp" />
+  <meta property="og:title" content="Teixeira Mods — Guias GTA Online" />
+  <meta property="og:description" content="Guias em PDF de progressão para GTA Online. Pague no Pix e baixe na hora." />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%2308080d'/%3E%3Crect x='3' y='3' width='58' height='58' fill='none' stroke='%2339ff88' stroke-width='3'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' dominant-baseline='middle' font-family='Arial Black' font-size='28' fill='%2339ff88'%3ETX%3C/text%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -26,11 +25,9 @@
         <span class="logo__text">TEIXEIRA<b>MODS</b></span>
       </a>
       <nav class="nav__links" aria-label="Principal">
-        <a href="#planos">Planos</a>
+        <a href="#planos">Guias</a>
         <a href="#trajes">Trajes</a>
         <a href="#como">Como funciona</a>
-        <a href="#entregas">Resultados</a>
-        <a href="#avaliacoes">Avaliações</a>
       </nav>
       <a class="btn btn--sm btn--line js-discord" href="#" target="_blank" rel="noopener">Suporte</a>
       <button class="nav__burger" aria-label="Abrir menu" aria-expanded="false"><span></span><span></span></button>
@@ -40,26 +37,20 @@
   <main id="topo">
     <!-- HERO -->
     <section class="hero">
-      <div class="hero__bg" aria-hidden="true">
-        <img src="assets/entregas/e23.webp" alt="" fetchpriority="high" />
-      </div>
+      <div class="hero__bg hero__bg--plain" aria-hidden="true"></div>
       <div class="container hero__inner">
-        <p class="label reveal">GTA Online <i>/</i> Upgrade de conta</p>
+        <p class="label reveal">GTA Online <i>/</i> Guias de progressão</p>
         <h1 class="hero__title reveal">Domine<br />Los Santos<span class="money">$</span></h1>
-        <p class="hero__sub reveal">Dinheiro, level, carros e trajes modded. Escolha o pacote, pague no Pix e <b>baixe o arquivo com todo o upgrade na mesma hora</b>.</p>
+        <p class="hero__sub reveal">Guias em PDF com a rota para evoluir sua conta: juntar dinheiro, subir de level e montar carros e trajes <b>usando só o próprio jogo</b>. Pague no Pix e baixe na hora.</p>
         <div class="hero__cta reveal">
-          <a href="#planos" class="btn btn--primary btn--lg">Ver pacotes</a>
-          <a href="#entregas" class="btn btn--line btn--lg">Ver resultados</a>
+          <a href="#planos" class="btn btn--primary btn--lg">Ver guias</a>
+          <a href="#como" class="btn btn--line btn--lg">Como funciona</a>
         </div>
-      </div>
-      <div class="hero__hud reveal" aria-hidden="true">
-        <span class="hud__cash">$0</span>
-        <span class="hud__bank">$<span class="count" data-to="106773450" data-fmt="plain">0</span></span>
       </div>
       <div class="container">
         <dl class="stats reveal">
-          <div><dt><span class="count" data-to="500">0</span><small>MI</small></dt><dd>no plano Elite</dd></div>
-          <div><dt><span class="count" data-to="2000">0</span><small>LVL</small></dt><dd>maior nível alcançado</dd></div>
+          <div><dt><span class="count" data-to="8">0</span><small>GUIAS</small></dt><dd>do iniciante ao elite</dd></div>
+          <div><dt>PDF</dt><dd>passo a passo com checklist</dd></div>
           <div><dt>PIX</dt><dd>QR Code ou copia e cola</dd></div>
           <div><dt>NA HORA</dt><dd>download após o pagamento</dd></div>
         </dl>
@@ -79,8 +70,8 @@
         <header class="shead reveal">
           <span class="shead__idx">01</span>
           <div>
-            <h2>Planos de upgrade</h2>
-            <p>Toque em um pacote para ver tudo o que vem nele.</p>
+            <h2>Guias de progressão</h2>
+            <p>Cada guia traz a rota para buscar as metas dentro do jogo. Toque para ver o conteúdo.</p>
           </div>
         </header>
         <div class="tiles" id="plans"></div>
@@ -93,8 +84,8 @@
         <header class="shead reveal">
           <span class="shead__idx">02</span>
           <div>
-            <h2>Trajes modded</h2>
-            <p>Masculinos e femininos. No GTA Online a aparência diz tudo.</p>
+            <h2>Guias de trajes</h2>
+            <p>Passo a passo para montar e salvar visuais masculinos e femininos com as peças do jogo.</p>
           </div>
         </header>
         <div class="tiles tiles--3" id="outfits"></div>
@@ -112,40 +103,11 @@
           </div>
         </header>
         <ol class="steps">
-          <li class="step reveal"><span class="step__n">01</span><h3>Escolha</h3><p>Selecione o pacote, informe a plataforma e o seu nick.</p></li>
+          <li class="step reveal"><span class="step__n">01</span><h3>Escolha</h3><p>Escolha o guia e preencha seus dados para o Pix.</p></li>
           <li class="step reveal"><span class="step__n">02</span><h3>Gere o Pix</h3><p>Aceite os termos e gere o pagamento. QR Code e copia e cola na tela.</p></li>
           <li class="step reveal"><span class="step__n">03</span><h3>Pague</h3><p>Pague pelo app do seu banco. A confirmação é automática.</p></li>
-          <li class="step reveal"><span class="step__n">04</span><h3>Entrega</h3><p>Arquivo enviado com todo o upgrade. Você recebe no mesmo momento.</p></li>
+          <li class="step reveal"><span class="step__n">04</span><h3>Download</h3><p>O guia em PDF é liberado na tela assim que o Pix é confirmado.</p></li>
         </ol>
-      </div>
-    </section>
-
-    <!-- RESULTADOS -->
-    <section class="section section--alt" id="entregas">
-      <div class="container">
-        <header class="shead reveal">
-          <span class="shead__idx">04</span>
-          <div>
-            <h2>Resultados de clientes</h2>
-            <p>Prints de contas já upadas. Toque para ampliar.</p>
-          </div>
-        </header>
-        <div class="filters" role="tablist" aria-label="Filtrar por plataforma" id="filters"></div>
-        <div class="gallery" id="gallery"></div>
-      </div>
-    </section>
-
-    <!-- AVALIAÇÕES -->
-    <section class="section" id="avaliacoes">
-      <div class="container">
-        <header class="shead reveal">
-          <span class="shead__idx">05</span>
-          <div>
-            <h2>Avaliações</h2>
-            <p>Postadas pelos clientes no nosso Discord.</p>
-          </div>
-        </header>
-        <div class="reviews" id="reviews"></div>
       </div>
     </section>
 
@@ -154,9 +116,9 @@
       <div class="container cta__inner reveal">
         <div>
           <h2>Pronto pra conquistar <span>Los Santos?</span></h2>
-          <p>Escolha o pacote e receba o arquivo assim que o Pix cair.</p>
+          <p>Escolha o guia e baixe assim que o Pix for confirmado.</p>
         </div>
-        <a href="#planos" class="btn btn--primary btn--lg">Escolher pacote</a>
+        <a href="#planos" class="btn btn--primary btn--lg">Ver guias</a>
       </div>
     </section>
   </main>
@@ -165,9 +127,9 @@
     <div class="container footer__inner">
       <a href="#topo" class="logo"><span class="logo__mark">TX</span><span class="logo__text">TEIXEIRA<b>MODS</b></span></a>
       <nav class="footer__links" aria-label="Rodapé">
-        <a href="#planos">Planos</a><a href="#trajes">Trajes</a><a href="#" class="js-discord" target="_blank" rel="noopener">Suporte no Discord</a>
+        <a href="#planos">Guias</a><a href="#trajes">Trajes</a><a href="#" class="js-discord" target="_blank" rel="noopener">Suporte no Discord</a>
       </nav>
-      <p class="footer__legal">Não somos afiliados, associados ou endossados pela Rockstar Games ou Take-Two Interactive. GTA, Grand Theft Auto e marcas relacionadas pertencem aos seus respectivos donos. © <span id="year"></span> Teixeira Mods.</p>
+      <p class="footer__legal">Produtos digitais educativos: os guias ensinam a progredir usando os recursos do próprio jogo. Não entregamos dinheiro, level, veículos ou itens na sua conta, e os resultados dependem do seu tempo de jogo. Não somos afiliados, associados ou endossados pela Rockstar Games ou Take-Two Interactive. GTA, Grand Theft Auto e marcas relacionadas pertencem aos seus respectivos donos. © <span id="year"></span> Teixeira Mods.</p>
     </div>
   </footer>
 
@@ -227,7 +189,7 @@
             </label>
             <label class="accept">
               <input type="checkbox" id="orderAccept" />
-              <span>Li e aceito os <button type="button" class="link" id="openTerms">termos de compra</button> e estou ciente de que a compra dá acesso a um arquivo digital com o upgrade.</span>
+              <span>Li e aceito os <button type="button" class="link" id="openTerms">termos de compra</button> e estou ciente de que estou comprando um guia em PDF: dinheiro e level são metas de progressão, não itens entregues na conta.</span>
             </label>
             <p class="form__error" id="formError" role="alert"></p>
             <button class="btn btn--primary btn--lg btn--block" id="orderSend" type="submit" disabled>Gerar pagamento</button>
@@ -264,8 +226,8 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
               </span>
               <p class="pane__title">Pagamento confirmado</p>
-              <p class="paid__text">Seu arquivo com todo o upgrade está pronto.</p>
-              <a class="btn btn--primary btn--lg btn--block" id="downloadBtn" href="#" target="_blank" rel="noopener" download>Baixar arquivo</a>
+              <p class="paid__text">Seu guia em PDF está pronto para download.</p>
+              <a class="btn btn--primary btn--lg btn--block" id="downloadBtn" href="#" target="_blank" rel="noopener" download>Baixar guia (PDF)</a>
               <p class="paid__hint">Guarde o link. Dúvidas? <a href="#" class="js-discord" target="_blank" rel="noopener">Suporte no Discord</a></p>
             </div>
           </div>
@@ -288,26 +250,27 @@
         </div>
         <div class="terms__body" tabindex="0">
           <h4>1. Objeto</h4>
-          <p>A compra dá acesso a um arquivo digital com o upgrade do plano ou pacote escolhido, acompanhado das instruções para o próprio cliente aplicá-lo e continuar seu upgrade. A compra não corresponde à contratação de uma pessoa para operar a conta do cliente.</p>
-          <h4>2. O que o cliente recebe</h4>
-          <p>Após a confirmação do pagamento, o arquivo ou link de download é liberado no mesmo momento, na própria tela de compra. Os arquivos podem estar hospedados em serviços externos, como Google Drive ou equivalente.</p>
-          <h4>3. Como funciona a compra</h4>
-          <p>Escolha do produto, aceite destes termos, pagamento, confirmação da transação e liberação do arquivo. O simples envio do pedido não representa pagamento aprovado.</p>
-          <h4>4. Pagamento</h4>
-          <p>O pagamento é feito por Pix, no valor apresentado no momento da compra. Pagamentos pendentes, recusados, cancelados ou expirados mantêm o arquivo bloqueado até a regularização.</p>
-          <h4>5. Natureza do produto e resultados</h4>
-          <p>Os itens listados em cada plano descrevem o conteúdo do arquivo. A aplicação depende do próprio cliente, e o resultado pode variar conforme versão do GTA, plataforma, configurações e atualizações do jogo.</p>
-          <h4>6. Riscos</h4>
-          <p>O uso de modificações no GTA Online não é permitido pelos termos da Rockstar Games e pode resultar em reset ou banimento da conta. Ao comprar, o cliente declara estar ciente e assume esse risco.</p>
-          <h4>7. Segurança dos dados</h4>
-          <p>Nunca compartilhe senha, código de autenticação, token ou cookies de sessão. A loja não solicita essas informações para enviar o arquivo.</p>
-          <p>Nome, e-mail, telefone e CPF informados na compra são usados apenas para gerar e identificar o pagamento Pix, e são compartilhados somente com o processador de pagamentos (CashinPay).</p>
+          <p>A compra dá acesso a um guia digital em PDF sobre progressão e personalização no GTA Online, correspondente ao pacote escolhido. O guia ensina o próprio cliente a progredir usando apenas atividades, menus e recursos oficiais do jogo.</p>
+          <h4>2. O que não está incluído</h4>
+          <p>Não entregamos dinheiro (GTA$), level/RP, veículos, roupas, propriedades, desbloqueios ou qualquer item na conta do cliente, e não acessamos nem operamos a conta. Valores como 30, 100, 200, 350 ou 500 milhões e levels citados nos pacotes são <b>metas de progressão</b> que o guia ajuda a buscar, não resultados garantidos.</p>
+          <h4>3. Resultados</h4>
+          <p>O tempo para atingir cada meta depende do tempo de jogo, do conteúdo liberado na conta, de eventos e bônus oficiais e de atualizações feitas pela desenvolvedora. Não há garantia de prazo ou de resultado.</p>
+          <h4>4. Entrega</h4>
+          <p>Após a confirmação do pagamento, o download do PDF é liberado no mesmo momento, na própria tela de compra.</p>
+          <h4>5. Pagamento</h4>
+          <p>O pagamento é feito por Pix, no valor apresentado no momento da compra, processado pela CashinPay. Pagamentos pendentes, cancelados ou expirados mantêm o download bloqueado.</p>
+          <h4>6. Direito de arrependimento</h4>
+          <p>Conforme o art. 49 do Código de Defesa do Consumidor, o cliente pode desistir da compra em até 7 dias a contar do pagamento, solicitando o reembolso pelo nosso suporte.</p>
+          <h4>7. Dados pessoais</h4>
+          <p>Nome, e-mail, telefone e CPF informados na compra são usados apenas para gerar e identificar o pagamento Pix e são compartilhados somente com o processador de pagamentos (CashinPay), conforme a LGPD. Nunca solicitamos senha, código de autenticação ou acesso à sua conta do jogo.</p>
           <h4>8. Uso pessoal</h4>
-          <p>O arquivo é de uso pessoal do comprador. Não é permitido revender, redistribuir ou publicar o material.</p>
-          <h4>9. Atualizações</h4>
-          <p>Atualizações do jogo podem alterar menus, mecânicas ou procedimentos, e algumas instruções podem exigir adaptação.</p>
-          <h4>10. Suporte</h4>
-          <p>O suporte pelo Discord orienta sobre o acesso ao arquivo, o download e dúvidas sobre o conteúdo enviado.</p>
+          <p>O guia é de uso pessoal do comprador. Não é permitido revender, redistribuir ou publicar o material.</p>
+          <h4>9. Atualizações do jogo</h4>
+          <p>Atualizações podem alterar menus, preços, atividades ou procedimentos, e algumas instruções podem exigir adaptação.</p>
+          <h4>10. Marcas</h4>
+          <p>Não temos vínculo com a Rockstar Games ou a Take-Two Interactive. GTA e marcas relacionadas pertencem aos seus respectivos donos.</p>
+          <h4>11. Suporte</h4>
+          <p>O suporte pelo Discord atende dúvidas sobre o pagamento, o download, o conteúdo do guia e pedidos de reembolso.</p>
         </div>
         <div class="termsbox__foot">
           <button type="button" class="btn btn--line" id="backTerms">Voltar</button>
@@ -317,18 +280,12 @@
     </div>
   </div>
 
-  <!-- LIGHTBOX -->
-  <div class="lightbox" id="lightbox" aria-hidden="true">
-    <button class="lightbox__close" data-lb-close aria-label="Fechar">×</button>
-    <button class="lightbox__nav lightbox__prev" data-lb-prev aria-label="Anterior">‹</button>
-    <figure>
-      <img id="lbImg" alt="" />
-      <figcaption id="lbCap"></figcaption>
-    </figure>
-    <button class="lightbox__nav lightbox__next" data-lb-next aria-label="Próxima">›</button>
-  </div>
-
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <aside class="notice" id="notice" role="note">
+    <span>Guias educativos em PDF. Não entregamos dinheiro, level ou itens na conta. Sem vínculo com a Rockstar Games.</span>
+    <button type="button" class="notice__close" aria-label="Fechar aviso">×</button>
+  </aside>
 
   <script src="config.js"></script>
   <script src="pagamento.js"></script>

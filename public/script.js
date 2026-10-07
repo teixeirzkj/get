@@ -15,22 +15,21 @@
      ========================================================= */
   const produtos = {};
   L.planos.forEach((p) => {
-    const lvl = p.itens.find((i) => /^level/i.test(i));
     produtos[p.id] = {
       id: p.id, cor: p.cor, preco: p.preco, destaque: p.destaque, desc: p.desc,
-      tier: p.nome.replace("Plano ", ""), titulo: p.nome,
-      grande: p.itens[0].replace(/\s*Milh(õ|o)es/i, ""), unidade: "MI",
-      sub: lvl || p.itens[1],
+      tier: p.nome, titulo: p.nome,
+      grande: p.meta, unidade: "MI · META",
+      sub: p.sub,
       itens: p.itens,
     };
   });
   L.trajes.forEach((t) => {
     produtos[t.id] = {
       id: t.id, cor: "green", preco: t.preco, destaque: t.destaque, desc: t.desc,
-      tier: "Trajes", titulo: `Pacote ${t.qtd} Trajes`,
+      tier: "Guia de trajes", titulo: `Guia ${t.qtd} Trajes`,
       grande: String(t.qtd), unidade: "TRAJES",
-      sub: `${brl(t.preco / t.qtd)} por traje`,
-      itens: [`${t.qtd} Trajes Modded`, "Masculinos e femininos", "Download na hora"],
+      sub: "Guia em PDF com checklist",
+      itens: [`Passo a passo para ${t.qtd} trajes`, "Visuais masculinos e femininos", "Checklist para cada traje", "Download do PDF na hora"],
     };
   });
 
@@ -44,90 +43,33 @@
       </span>
       <span class="tile__detail">
         <span class="tile__list">${p.itens.slice(0, 5).map((it) => `<span>${esc(it)}</span>`).join("")}${p.itens.length > 5 ? `<span class="more">+${p.itens.length - 5} ${p.itens.length - 5 > 1 ? "itens" : "item"}</span>` : ""}</span>
-        <span class="tile__cta">Ver pacote <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2"/></svg></span>
+        <span class="tile__cta">Ver guia <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2"/></svg></span>
       </span>
     </button>`;
 
   $("#plans").innerHTML = L.planos.map((p, i) => tile(produtos[p.id], i)).join("") + `
     <a class="tile tile--custom reveal js-discord" style="--d:.12s" href="${esc(L.discord)}" target="_blank" rel="noopener">
       <span class="tile__main">
-        <span class="tile__tier">Personalizado</span>
-        <span class="tile__big tile__big--txt">Monte<br/>o seu</span>
-        <span class="tile__sub">Dinheiro, level, carros e trajes na medida</span>
+        <span class="tile__tier">Suporte</span>
+        <span class="tile__big tile__big--txt">Ficou<br/>em dúvida?</span>
+        <span class="tile__sub">Ajudamos você a escolher o guia certo</span>
       </span>
       <span class="tile__detail">
-        <span class="tile__list"><span>Escolha cada item</span><span>Orçamento pelo suporte</span></span>
+        <span class="tile__list"><span>Qual guia combina com sua conta</span><span>Dúvidas sobre pagamento e download</span></span>
         <span class="tile__cta">Falar no Discord <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2"/></svg></span>
       </span>
     </a>`;
   $("#outfits").innerHTML = L.trajes.map((t, i) => tile(produtos[t.id], i)).join("");
 
   /* =========================================================
-     RESULTADOS (galeria)
-     ========================================================= */
-  const tags = (e) => [
-    `<span class="tag tag--plat">${esc(e.plataforma)}</span>`,
-    e.dinheiro ? `<span class="tag tag--money">$ ${esc(e.dinheiro)}</span>` : "",
-    e.nivel ? `<span class="tag">LVL ${e.nivel}</span>` : "",
-  ].join("");
-
-  $("#gallery").innerHTML = L.entregas.map((e, i) => `
-    <button class="shot" data-i="${i}" data-plat="${esc(e.plataforma)}" aria-label="Ampliar: ${esc(e.pacote)} — ${esc(e.plataforma)}">
-      <img src="assets/entregas/e${e.img}-thumb.webp" alt="${esc(e.pacote)} na ${esc(e.plataforma)}" loading="lazy" decoding="async" />
-      <span class="shot__info"><span class="shot__title">${esc(e.pacote)}</span><span class="shot__tags">${tags(e)}</span></span>
-    </button>`).join("");
-
-  const plats = ["Todas", ...new Set(L.entregas.map((e) => e.plataforma))];
-  $("#filters").innerHTML = plats.map((p, i) => {
-    const n = p === "Todas" ? L.entregas.length : L.entregas.filter((e) => e.plataforma === p).length;
-    return `<button class="chip" role="tab" aria-selected="${i === 0}" data-f="${esc(p)}">${esc(p)} <small>${n}</small></button>`;
-  }).join("");
-  $("#filters").addEventListener("click", (ev) => {
-    const b = ev.target.closest(".chip"); if (!b) return;
-    $$(".chip").forEach((c) => c.setAttribute("aria-selected", c === b));
-    $$(".shot").forEach((s) => s.classList.toggle("is-hidden", !(b.dataset.f === "Todas" || s.dataset.plat === b.dataset.f)));
-  });
-
-  /* lightbox */
-  const lb = $("#lightbox");
-  let cur = 0;
-  const visible = () => $$(".shot:not(.is-hidden)").map((s) => +s.dataset.i);
-  const showLb = (i) => {
-    cur = i; const e = L.entregas[i];
-    $("#lbImg").src = `assets/entregas/e${e.img}.webp`;
-    $("#lbImg").alt = `${e.pacote} — ${e.plataforma}`;
-    $("#lbCap").innerHTML = `<span class="tag">${esc(e.pacote)}</span>${tags(e)}${e.data ? `<span class="tag">${esc(e.data)}</span>` : ""}`;
-  };
-  const step = (d) => { const v = visible(); showLb(v[(v.indexOf(cur) + d + v.length) % v.length]); };
-  $("#gallery").addEventListener("click", (ev) => { const s = ev.target.closest(".shot"); if (s) { showLb(+s.dataset.i); openLayer(lb); } });
-  lb.addEventListener("click", (ev) => {
-    if (ev.target.closest("[data-lb-prev]")) step(-1);
-    else if (ev.target.closest("[data-lb-next]")) step(1);
-    else if (ev.target.closest("[data-lb-close]") || ev.target === lb || ev.target.tagName === "FIGURE") closeLayer(lb);
-  });
-  let tx = null;
-  lb.addEventListener("touchstart", (e) => (tx = e.touches[0].clientX), { passive: true });
-  lb.addEventListener("touchend", (e) => { if (tx == null) return; const dx = e.changedTouches[0].clientX - tx; if (Math.abs(dx) > 50) step(dx < 0 ? 1 : -1); tx = null; });
-
-  /* =========================================================
-     AVALIAÇÕES
-     ========================================================= */
-  $("#reviews").innerHTML = L.avaliacoes.map((r) => `
-    <article class="review reveal">
-      <div class="review__top"><span class="stars" aria-label="5 de 5 estrelas">★★★★★</span><span class="review__date">${esc(r.data || "")}</span></div>
-      <p class="review__text${r.texto ? "" : " is-empty"}">${r.texto ? esc(r.texto) : "Avaliou a compra em 5 estrelas."}</p>
-      <div class="review__foot"><span class="review__user">@${esc(r.user)}</span>${r.produto ? `<span class="review__prod">${esc(r.produto)}</span>` : ""}</div>
-    </article>`).join("");
-
-  /* =========================================================
-     CAMADAS (modal / lightbox)
+     CAMADAS (modal)
      ========================================================= */
   let lastFocus = null;
   function openLayer(el) {
     lastFocus = document.activeElement;
     el.classList.add("is-open"); el.setAttribute("aria-hidden", "false");
     document.documentElement.classList.add("is-locked");
-    setTimeout(() => (el.querySelector("[data-close], [data-lb-close]") || el).focus({ preventScroll: true }), 60);
+    setTimeout(() => (el.querySelector("[data-close]") || el).focus({ preventScroll: true }), 60);
   }
   function closeLayer(el) {
     el.classList.remove("is-open"); el.setAttribute("aria-hidden", "true");
@@ -279,10 +221,10 @@
           const a = $("#downloadBtn");
           if (r.downloadUrl) {
             a.href = r.downloadUrl; a.hidden = false;
-            $(".paid__text", modal).textContent = "Seu arquivo com todo o upgrade está pronto.";
+            $(".paid__text", modal).textContent = "Seu guia em PDF está pronto para download.";
           } else {
             a.hidden = true;
-            $(".paid__text", modal).textContent = "Pagamento recebido! Chame o suporte no Discord para receber seu arquivo.";
+            $(".paid__text", modal).textContent = "Pagamento recebido! Chame o suporte no Discord para receber seu guia.";
           }
           pane("paid");
         } else if (r.status === "expired") {
@@ -309,8 +251,7 @@
 
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && !termsBox.hidden) { fecharTermos(); return; }
-    if (e.key === "Escape") { if (lb.classList.contains("is-open")) closeLayer(lb); else if (modal.classList.contains("is-open")) closeLayer(modal); }
-    if (lb.classList.contains("is-open")) { if (e.key === "ArrowRight") step(1); if (e.key === "ArrowLeft") step(-1); }
+    if (e.key === "Escape" && modal.classList.contains("is-open")) closeLayer(modal);
   });
 
   let toastT;
@@ -360,4 +301,12 @@
   $$(".reveal, .step").forEach((el) => io.observe(el));
 
   if (Pay.demo) toast("Modo demonstração de pagamento ativo");
+
+  /* aviso pequeno no canto */
+  const aviso = $("#notice");
+  try { if (localStorage.getItem("avisoFechado") === "1") aviso.hidden = true; } catch (_) {}
+  $(".notice__close", aviso).addEventListener("click", () => {
+    aviso.hidden = true;
+    try { localStorage.setItem("avisoFechado", "1"); } catch (_) {}
+  });
 })();

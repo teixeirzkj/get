@@ -1,9 +1,9 @@
-Coloque aqui o arquivo de cada pacote. Esta pasta NÃO é pública:
+Coloque aqui o guia (PDF) de cada pacote. Esta pasta NÃO é pública:
 o arquivo só é entregue pelo /api/download depois que o Pix é confirmado.
 
 O nome do arquivo deve ser o id do pacote + a extensão:
-  iniciante.zip   basico.zip   executivo.zip   mafioso.zip   elite.zip
-  trajes-5.zip    trajes-10.zip    trajes-20.zip
+  iniciante.pdf   basico.pdf   executivo.pdf   mafioso.pdf   elite.pdf
+  trajes-5.pdf    trajes-10.pdf    trajes-20.pdf
 (pode ser .zip, .rar, .7z, .pdf, .txt...)
 
 Limite: cada arquivo deve ter no máximo 4 MB (limite de resposta da Vercel).
