@@ -6,6 +6,12 @@ window.LOJA = {
   nome: "Teixeira Mods",
   discord: "https://discord.gg/CtW7Us5WNz", // suporte
 
+  // Pagamento Pix via CashinPay (código em /api; ver README.md)
+  pagamento: {
+    endpoint: "/api/pagamento", // POST cria o Pix · GET ?id= consulta o status
+    intervaloStatus: 4000,      // ms entre cada consulta de status
+  },
+
   planos: [
     {
       id: "iniciante", nome: "Plano Iniciante", cor: "green", preco: 24.9,

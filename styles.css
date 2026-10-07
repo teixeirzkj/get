@@ -220,6 +220,9 @@ button { font: inherit; color: inherit; cursor: pointer; background: none; borde
 .order__items li { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 14px; font-weight: 500; }
 .order__items li::before { content: ""; flex: none; width: 8px; height: 8px; background: var(--c); }
 .order__flow { padding: 30px 28px; min-width: 0; }
+.pane { display: none; }
+.pane.is-active { display: block; animation: paneIn .35s var(--ease); }
+@keyframes paneIn { from { opacity: 0; transform: translateY(6px); } }
 .pane__title { margin: 0 0 18px; font-family: var(--tech); font-size: 15px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
 
 .field { display: grid; gap: 6px; margin-bottom: 14px; font-family: var(--tech); font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
@@ -231,7 +234,6 @@ button { font: inherit; color: inherit; cursor: pointer; background: none; borde
 /* painel de termos sobre a janela de compra */
 .modal__panel.has-terms { overflow: hidden; }
 .termsbox { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; background: var(--surface); animation: paneIn .3s var(--ease); }
-@keyframes paneIn { from { opacity: 0; transform: translateY(6px); } }
 .termsbox[hidden] { display: none; }
 .termsbox__head { display: flex; align-items: center; justify-content: space-between; padding: 20px 28px 16px; border-bottom: 1px solid var(--line); }
 .termsbox__head .pane__title { margin: 0; }
@@ -244,10 +246,33 @@ button { font: inherit; color: inherit; cursor: pointer; background: none; borde
 .accept input { flex: none; width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--money); cursor: pointer; }
 .form__error { margin: 0 0 10px; font-size: 13px; color: var(--red); }
 .form__error:empty { display: none; }
-.form__note { margin: 12px 0 0; font-size: 13px; line-height: 1.5; color: var(--muted); text-align: center; }
-.form__note b { color: var(--text); }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; }
+.field-group { margin: 6px 0 12px; padding-top: 14px; border-top: 1px solid var(--line); font-family: var(--tech); font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--c); }
+.err__discord { margin-top: 8px; }
 
+.pix { display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: center; margin-bottom: 16px; }
+.pix__qr { display: grid; place-items: center; width: 200px; height: 200px; padding: 10px; background: #fff; border-radius: var(--r); }
+.pix__qr img, .pix__qr canvas { width: 100% !important; height: 100% !important; }
+.pix__noqr { color: #333; font-size: 13px; text-align: center; }
+.pix__amount { margin: 0 0 10px; font-family: var(--display); font-size: 40px; line-height: 1; }
+.pix__how { margin: 0; padding-left: 18px; font-size: 14px; color: var(--muted); display: grid; gap: 4px; }
+.copy { display: flex; gap: 6px; }
+.copy input { font-family: ui-monospace, Consolas, monospace !important; font-size: 13px !important; }
+.copy .btn { height: 48px; flex: none; }
+.pix__status { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid var(--line-2); background: var(--bg); font-size: 14px; }
+.pix__timer { margin-left: auto; font-family: var(--tech); font-weight: 700; color: var(--money); }
+.spinner { width: 34px; height: 34px; border: 3px solid #ddd; border-top-color: #111; border-radius: 50%; animation: spin .8s linear infinite; }
+.spinner--sm { width: 16px; height: 16px; border-width: 2px; border-color: var(--line-2); border-top-color: var(--money); }
+@keyframes spin { to { transform: rotate(360deg); } }
 
+.paid { text-align: center; padding: 10px 0; }
+.paid__icon { display: inline-grid; place-items: center; width: 64px; height: 64px; margin-bottom: 16px; border: 2px solid var(--money); color: var(--money); animation: pop .5s var(--ease); }
+.paid__icon svg { width: 34px; height: 34px; }
+@keyframes pop { from { transform: scale(.6); opacity: 0; } }
+.paid .pane__title { margin-bottom: 6px; }
+.paid__text { margin: 0 0 22px; color: var(--muted); }
+.paid__hint { margin: 14px 0 0; font-size: 13px; color: var(--muted); }
+.paid__hint a { color: var(--money); }
 
 /* ---------- lightbox ---------- */
 .lightbox { background: rgba(3,3,6,.94); }
@@ -352,6 +377,9 @@ button { font: inherit; color: inherit; cursor: pointer; background: none; borde
   .footer__inner { grid-template-columns: 1fr; }
   .footer__links { justify-self: start; }
   .logo__text { font-size: 13px; }
+  .pix { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+  .field-row { grid-template-columns: 1fr; }
+  .pix__how { text-align: left; }
   .lightbox__nav { top: auto; bottom: 16px; transform: none; }
 }
 
