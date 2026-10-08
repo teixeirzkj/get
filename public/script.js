@@ -301,12 +301,4 @@
   $$(".reveal, .step").forEach((el) => io.observe(el));
 
   if (Pay.demo) toast("Modo demonstração de pagamento ativo");
-
-  /* aviso pequeno no canto */
-  const aviso = $("#notice");
-  try { if (localStorage.getItem("avisoFechado") === "1") aviso.hidden = true; } catch (_) {}
-  $(".notice__close", aviso).addEventListener("click", () => {
-    aviso.hidden = true;
-    try { localStorage.setItem("avisoFechado", "1"); } catch (_) {}
-  });
 })();

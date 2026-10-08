@@ -394,9 +394,3 @@ button { font: inherit; color: inherit; cursor: pointer; background: none; borde
   .js .reveal { opacity: 1; transform: none; }
 }
 
-/* ---------- aviso pequeno no canto ---------- */
-.notice { position: fixed; left: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 60; display: flex; align-items: flex-start; gap: 8px; max-width: 300px; padding: 8px 8px 8px 10px; background: rgba(12,12,19,.92); border: 1px solid var(--line-2); backdrop-filter: blur(8px); font-size: 11px; line-height: 1.4; color: var(--muted); }
-.notice[hidden] { display: none; }
-.notice__close { flex: none; width: 18px; height: 18px; font-size: 14px; line-height: 1; color: var(--muted); }
-.notice__close:hover { color: var(--text); }
-@media (max-width: 640px) { .notice { right: 12px; max-width: none; } }
