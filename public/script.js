@@ -26,10 +26,10 @@
   L.trajes.forEach((t) => {
     produtos[t.id] = {
       id: t.id, cor: "green", preco: t.preco, destaque: t.destaque, desc: t.desc,
-      tier: "Guia de trajes", titulo: `Guia ${t.qtd} Trajes`,
+      tier: "Trajes", titulo: `${t.qtd} Trajes`,
       grande: String(t.qtd), unidade: "TRAJES",
-      sub: "Guia em PDF com checklist",
-      itens: [`Passo a passo para ${t.qtd} trajes`, "Visuais masculinos e femininos", "Checklist para cada traje", "Download do PDF na hora"],
+      sub: "Passo a passo com checklist",
+      itens: [`Passo a passo para ${t.qtd} trajes`, "Visuais masculinos e femininos", "Checklist para cada traje", "Download na hora"],
     };
   });
 
@@ -43,7 +43,7 @@
       </span>
       <span class="tile__detail">
         <span class="tile__list">${p.itens.slice(0, 5).map((it) => `<span>${esc(it)}</span>`).join("")}${p.itens.length > 5 ? `<span class="more">+${p.itens.length - 5} ${p.itens.length - 5 > 1 ? "itens" : "item"}</span>` : ""}</span>
-        <span class="tile__cta">Ver guia <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2"/></svg></span>
+        <span class="tile__cta">Ver pacote <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2"/></svg></span>
       </span>
     </button>`;
 
@@ -52,10 +52,10 @@
       <span class="tile__main">
         <span class="tile__tier">Suporte</span>
         <span class="tile__big tile__big--txt">Ficou<br/>em dúvida?</span>
-        <span class="tile__sub">Ajudamos você a escolher o guia certo</span>
+        <span class="tile__sub">Ajudamos você a escolher o pacote certo</span>
       </span>
       <span class="tile__detail">
-        <span class="tile__list"><span>Qual guia combina com sua conta</span><span>Dúvidas sobre pagamento e download</span></span>
+        <span class="tile__list"><span>Qual pacote combina com sua conta</span><span>Dúvidas sobre pagamento e download</span></span>
         <span class="tile__cta">Falar no Discord <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2"/></svg></span>
       </span>
     </a>`;
@@ -221,10 +221,10 @@
           const a = $("#downloadBtn");
           if (r.downloadUrl) {
             a.href = r.downloadUrl; a.hidden = false;
-            $(".paid__text", modal).textContent = "Seu guia em PDF está pronto para download.";
+            $(".paid__text", modal).textContent = "Seu arquivo está pronto para download.";
           } else {
             a.hidden = true;
-            $(".paid__text", modal).textContent = "Pagamento recebido! Chame o suporte no Discord para receber seu guia.";
+            $(".paid__text", modal).textContent = "Pagamento recebido! Chame o suporte no Discord para receber seu arquivo.";
           }
           pane("paid");
         } else if (r.status === "expired") {
