@@ -1,6 +1,6 @@
 // GET /api/download?id=<transação> — entrega o arquivo do pacote somente se o Pix estiver pago.
 const fs = require("fs");
-const { produtos, cashinpay, produtoDoId, arquivoDoProduto, mesmoValor, valorDe } = require("./_lib");
+const { produtos, cashinpay, produtoDoId, arquivoDoProduto, pago, mesmoValor, valorDe } = require("./_lib");
 
 const TIPOS = { zip: "application/zip", rar: "application/vnd.rar", "7z": "application/x-7z-compressed", pdf: "application/pdf", txt: "text/plain; charset=utf-8", json: "application/json", xml: "application/xml" };
 
@@ -23,7 +23,7 @@ module.exports = async (req, res) => {
   try { tx = await cashinpay("GET", `/transactions/${encodeURIComponent(id)}`); }
   catch (e) { console.error("[download]", e.message); return erro(res, 502, "Não foi possível verificar o pagamento agora."); }
 
-  if (tx.status !== "paid" || !mesmoValor(valorDe(tx.amount), item.preco)) return erro(res, 403, "Pagamento não confirmado.");
+  if (!pago(tx.status) || !mesmoValor(valorDe(tx.amount), item.preco)) return erro(res, 403, "Pagamento não confirmado.");
 
   const arq = arquivoDoProduto(produto);
   if (!arq) return erro(res, 404, "Arquivo indisponível no momento.");

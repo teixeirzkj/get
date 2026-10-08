@@ -222,19 +222,6 @@
             <div class="pix__status"><span class="spinner spinner--sm" aria-hidden="true"></span><span id="pixStatus">Aguardando pagamento…</span><span class="pix__timer" id="pixTimer"></span></div>
           </div>
 
-          <!-- 3. pago -->
-          <div class="pane" data-pane="paid">
-            <div class="paid">
-              <span class="paid__icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
-              </span>
-              <p class="pane__title">Pagamento confirmado</p>
-              <p class="paid__text">Seu arquivo está pronto para download.</p>
-              <a class="btn btn--primary btn--lg btn--block" id="downloadBtn" href="#" target="_blank" rel="noopener" download>Baixar arquivo</a>
-              <p class="paid__hint">Guarde o link. Dúvidas? <a href="#" class="js-discord" target="_blank" rel="noopener">Suporte no Discord</a></p>
-            </div>
-          </div>
-
           <!-- erro / expirado -->
           <div class="pane" data-pane="error">
             <p class="pane__title" id="errorTitle">Não foi possível gerar o pagamento</p>
@@ -280,6 +267,25 @@
           <button type="button" class="btn btn--line" id="backTerms">Voltar</button>
           <button type="button" class="btn btn--primary" id="acceptTerms">Li e aceito</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- popup de download (abre quando o Pix é confirmado) -->
+  <div class="modal modal--dl" id="dlModal" aria-hidden="true">
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__panel" role="dialog" aria-modal="true" aria-labelledby="dlTitle">
+      <button class="modal__close" data-close aria-label="Fechar">×</button>
+      <div class="paid">
+        <span class="paid__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
+        </span>
+        <p class="pane__title" id="dlTitle">Pagamento confirmado</p>
+        <p class="label dl__produto" id="dlProduto"></p>
+        <p class="paid__text" id="dlText">Seu arquivo está pronto para download.</p>
+        <a class="btn btn--primary btn--lg btn--block" id="dlBtn" href="#" target="_blank" rel="noopener" download>Baixar arquivo</a>
+        <a class="btn btn--primary btn--lg btn--block js-discord" id="dlSuporte" href="#" target="_blank" rel="noopener" hidden>Chamar no Discord</a>
+        <p class="paid__hint">Dúvidas? <a href="#" class="js-discord" target="_blank" rel="noopener">Suporte no Discord</a></p>
       </div>
     </div>
   </div>

@@ -1,6 +1,6 @@
 // POST /api/pagamento     → cria a cobrança Pix na CashinPay
 // GET  /api/pagamento?id= → consulta o status (e libera o download quando pago)
-const { produtos, cashinpay, novoId, produtoDoId, linkDownload, mesmoValor, valorDe } = require("./_lib");
+const { produtos, cashinpay, novoId, produtoDoId, linkDownload, pago, mesmoValor, valorDe } = require("./_lib");
 
 const PLATAFORMAS = ["Steam", "Epic Games", "Rockstar Launcher", "Xbox App (PC)", "Xbox Series / One", "PS5"];
 
@@ -74,7 +74,7 @@ async function consultar(req, res) {
 
   const tx = await cashinpay("GET", `/transactions/${encodeURIComponent(id)}`);
 
-  if (tx.status === "paid") {
+  if (pago(tx.status)) {
     // confere se o valor pago é o do produto
     if (!mesmoValor(valorDe(tx.amount), item.preco)) return res.status(403).json({ erro: "Pagamento não corresponde ao produto." });
     return res.status(200).json({ status: "paid", downloadUrl: linkDownload(produto, id) });

@@ -68,7 +68,9 @@ function linkDownload(produto, txId) {
   return linkExterno(produto);
 }
 
+// status que a CashinPay pode usar para "pago"
+const pago = (s) => ["paid", "approved", "completed", "confirmed"].includes(String(s || "").toLowerCase());
 const mesmoValor = (a, b) => Math.abs(Number(a) - Number(b)) < 0.005;
 const valorDe = (amount) => (amount && typeof amount === "object" ? amount.value : amount);
 
-module.exports = { produtos, cashinpay, novoId, produtoDoId, arquivoDoProduto, linkDownload, mesmoValor, valorDe };
+module.exports = { produtos, cashinpay, novoId, produtoDoId, arquivoDoProduto, linkDownload, pago, mesmoValor, valorDe };

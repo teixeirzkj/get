@@ -75,13 +75,13 @@
     el.classList.remove("is-open"); el.setAttribute("aria-hidden", "true");
     document.documentElement.classList.remove("is-locked");
     lastFocus && lastFocus.focus({ preventScroll: true });
-    if (el === modal) pararStatus();
   }
 
   /* =========================================================
      CHECKOUT
      ========================================================= */
   const modal = $("#orderModal");
+  const dlModal = $("#dlModal");
   const form = $("#orderForm");
   let atual = null;     // produto aberto
   let cobranca = null;  // pagamento gerado
@@ -111,6 +111,7 @@
     const t = ev.target.closest("[data-produto]"); if (t) abrirProduto(t.dataset.produto);
   });
   modal.addEventListener("click", (ev) => { if (ev.target.closest("[data-close]")) closeLayer(modal); });
+  dlModal.addEventListener("click", (ev) => { if (ev.target.closest("[data-close]")) closeLayer(dlModal); });
 
   /* termos: link dentro do texto de aceite abre o painel */
   const termsBox = $("#termsBox");
@@ -149,6 +150,8 @@
     btn.disabled = true; btn.textContent = "Gerando Pix…";
     try {
       cobranca = await Pay.criar({ produto: atual.id, plataforma, nick, nome, email, telefone, cpf, aceiteTermos: true });
+      cobranca.produto = atual.id;
+      pendente.salvar({ id: cobranca.id, produto: atual.id, t: Date.now() });
       await mostrarPix(cobranca);
       pane("pix");
       iniciarStatus();
@@ -211,29 +214,59 @@
     }));
   }
 
+  /* Pix pendente fica salvo no navegador: se o cliente fechar a janela, sair para o app do banco
+     ou recarregar a página, a checagem continua e o popup de download abre quando o Pix cair. */
+  const pendente = {
+    chave: "tm_pix_pendente",
+    ler() { try { const p = JSON.parse(localStorage.getItem(this.chave)); return p && Date.now() - p.t < 864e5 ? p : null; } catch (_) { return null; } },
+    salvar(p) { try { localStorage.setItem(this.chave, JSON.stringify(p)); } catch (_) {} },
+    limpar() { try { localStorage.removeItem(this.chave); } catch (_) {} },
+  };
+
+  let checando = false;
+  async function verificar() {
+    if (!cobranca || checando) return;
+    checando = true;
+    try {
+      const r = await Pay.status(cobranca.id, cobranca.produto);
+      if (r.status === "paid") {
+        pararStatus(); pendente.limpar();
+        mostrarDownload(cobranca.produto, r.downloadUrl);
+        cobranca = null;
+      } else if (r.status === "expired") {
+        pararStatus(); pendente.limpar();
+        if (modal.classList.contains("is-open")) mostrarErro("Pix expirado", "O tempo para pagamento acabou. Gere um novo Pix.");
+        cobranca = null;
+      }
+    } catch (_) { /* tenta de novo no próximo ciclo */ }
+    finally { checando = false; }
+  }
   function iniciarStatus() {
     pararStatus(false);
-    poll = setInterval(async () => {
-      try {
-        const r = await Pay.status(cobranca.id, atual.id);
-        if (r.status === "paid") {
-          pararStatus();
-          const a = $("#downloadBtn");
-          if (r.downloadUrl) {
-            a.href = r.downloadUrl; a.hidden = false;
-            $(".paid__text", modal).textContent = "Seu arquivo está pronto para download.";
-          } else {
-            a.hidden = true;
-            $(".paid__text", modal).textContent = "Pagamento recebido! Chame o suporte no Discord para receber seu arquivo.";
-          }
-          pane("paid");
-        } else if (r.status === "expired") {
-          pararStatus();
-          mostrarErro("Pix expirado", "O tempo para pagamento acabou. Gere um novo Pix.");
-        }
-      } catch (_) { /* tenta de novo no próximo ciclo */ }
-    }, Pay.intervalo);
+    poll = setInterval(verificar, Pay.intervalo);
   }
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) verificar(); });
+
+  function mostrarDownload(produtoId, url) {
+    const p = produtos[produtoId];
+    dlModal.dataset.cor = p ? p.cor : "green";
+    $("#dlProduto").textContent = p ? p.titulo : "";
+    const btn = $("#dlBtn"), sup = $("#dlSuporte");
+    if (url) {
+      btn.href = url; btn.hidden = false; sup.hidden = true;
+      btn.textContent = p ? `Baixar ${p.titulo}` : "Baixar arquivo";
+      $("#dlText").textContent = "Seu arquivo está pronto. Toque no botão para baixar.";
+    } else {
+      btn.hidden = true; sup.hidden = false;
+      $("#dlText").textContent = "Pagamento recebido! Chame o suporte no Discord para receber seu arquivo.";
+    }
+    if (modal.classList.contains("is-open")) closeLayer(modal);
+    openLayer(dlModal);
+  }
+
+  // retoma um Pix pendente (ex.: cliente voltou do app do banco e a página recarregou)
+  const salvo = pendente.ler();
+  if (salvo && produtos[salvo.produto]) { cobranca = { id: salvo.id, produto: salvo.produto }; verificar(); iniciarStatus(); }
   function pararStatus(limparTimer = true) {
     clearInterval(poll); poll = null;
     if (limparTimer) clearInterval(timer);
@@ -251,6 +284,7 @@
 
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && !termsBox.hidden) { fecharTermos(); return; }
+    if (e.key === "Escape" && dlModal.classList.contains("is-open")) { closeLayer(dlModal); return; }
     if (e.key === "Escape" && modal.classList.contains("is-open")) closeLayer(modal);
   });
 

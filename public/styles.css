@@ -274,6 +274,9 @@ button { font: inherit; color: inherit; cursor: pointer; background: none; borde
 .paid__text { margin: 0 0 22px; color: var(--muted); }
 .paid__hint { margin: 14px 0 0; font-size: 13px; color: var(--muted); }
 .paid__hint a { color: var(--money); }
+.modal--dl .modal__panel { width: min(440px, 100%); }
+.modal--dl .paid { padding: 40px 28px 30px; }
+.dl__produto { margin: 0 0 10px; color: var(--c); }
 
 /* ---------- lightbox ---------- */
 .lightbox { background: rgba(3,3,6,.94); }
