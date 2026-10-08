@@ -16,36 +16,36 @@ window.LOJA = {
   planos: [
     {
       id: "iniciante", nome: "Pacote Iniciante", cor: "green", preco: 24.9, meta: "30", sub: "Meta: 30 mi e Level 90",
-      desc: "Para quem está começando: a rota para os primeiros milhões e os primeiros levels usando as atividades do jogo.",
-      itens: ["Rota para juntar 30 milhões", "Rota para chegar ao Level 90", "Como montar 5 carros personalizados", "Como montar 5 trajes", "Como criar sua corrida", "Checklist de progresso"],
+      desc: "Para quem está começando: os primeiros milhões e os primeiros levels usando as atividades do jogo.",
+      itens: ["30 milhões", "Level 90", "5 carros personalizados", "5 trajes", "Corrida personalizada", "Checklist de progresso"],
     },
     {
       id: "basico", nome: "Pacote Básico", cor: "blue", preco: 34.9, meta: "100", sub: "Meta: 100 mi e Level 150",
-      desc: "Para expandir os ganhos: rota financeira com negócios, evolução de level e primeiro apartamento de luxo.",
-      itens: ["Rota para juntar 100 milhões", "Rota para chegar ao Level 150", "Como comprar um apartamento de luxo", "Como montar 8 carros personalizados", "Como montar 8 trajes", "Como criar sua corrida", "Checklist de progresso"],
+      desc: "Para expandir os ganhos: negócios, evolução de level e primeiro apartamento de luxo.",
+      itens: ["100 milhões", "Level 150", "Apartamento de luxo", "8 carros personalizados", "8 trajes", "Corrida personalizada", "Checklist de progresso"],
     },
     {
       id: "executivo", nome: "Pacote Executivo", cor: "orange", preco: 49.9, meta: "200", sub: "Meta: 200 mi e Level 250", destaque: "Mais vendido",
       desc: "Para acelerar: construção de capital com empresas, reinvestimento e evolução até o Level 250.",
-      itens: ["Rota para juntar 200 milhões", "Rota para chegar ao Level 250", "Apartamentos e empresas principais", "Como montar 12 carros personalizados", "Como montar 12 trajes", "Como criar sua corrida", "Checklist de progresso"],
+      itens: ["200 milhões", "Level 250", "Apartamentos e empresas principais", "12 carros personalizados", "12 trajes", "Corrida personalizada", "Checklist de progresso"],
     },
     {
       id: "mafioso", nome: "Pacote Mafioso", cor: "red", preco: 64.9, meta: "350", sub: "Meta: 350 mi e Level 400",
-      desc: "Para montar um império: estratégia de patrimônio com todas as empresas e grande parte das propriedades.",
-      itens: ["Rota para juntar 350 milhões", "Rota para chegar ao Level 400", "Estratégia para todas as empresas", "Como adquirir grande parte das propriedades", "Como montar 16 carros personalizados", "Como montar 16 trajes", "Desbloqueios e corrida", "Checklist de progresso"],
+      desc: "Para montar um império: patrimônio com todas as empresas e grande parte das propriedades.",
+      itens: ["350 milhões", "Level 400", "Todas as empresas", "Grande parte das propriedades", "16 carros personalizados", "16 trajes", "Desbloqueios e corrida", "Checklist de progresso"],
     },
     {
       id: "elite", nome: "Pacote Elite", cor: "purple", preco: 79.9, meta: "500", sub: "Meta: 500 mi e todas as propriedades", destaque: "Completo",
-      desc: "O plano de longo prazo mais completo: patrimônio, propriedades, desbloqueios, coleção de carros e trajes.",
-      itens: ["Rota de longo prazo para 500 milhões", "Como adquirir todas as propriedades", "Level e desbloqueios", "Como montar 20 carros personalizados", "Como montar 20 trajes", "Como criar sua corrida", "Conferência e checklist final"],
+      desc: "O pacote mais completo: patrimônio, propriedades, desbloqueios, coleção de carros e trajes.",
+      itens: ["500 milhões", "Todas as propriedades", "Level e desbloqueios", "20 carros personalizados", "20 trajes", "Corrida personalizada", "Checklist final"],
     },
   ],
 
   trajes: [
     { id: "trajes-5", qtd: 5, preco: 10.9, destaque: null,
-      desc: "Passo a passo para montar e salvar 5 visuais com as peças da sua conta. Ideal para renovar o personagem." },
+      desc: "5 visuais com as peças da sua conta. Ideal para renovar o personagem." },
     { id: "trajes-10", qtd: 10, preco: 17.9, destaque: null,
-      desc: "Metodologia para montar 10 visuais diferentes, um para cada ocasião, com checklist de cada traje." },
+      desc: "10 visuais diferentes, um para cada ocasião, com checklist de cada traje." },
     { id: "trajes-20", qtd: 20, preco: 24.9, destaque: "Melhor custo",
       desc: "O pacote mais completo: 20 visuais em estilos diferentes, do casual ao temático, com checklist." },
   ],

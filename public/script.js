@@ -28,8 +28,8 @@
       id: t.id, cor: "green", preco: t.preco, destaque: t.destaque, desc: t.desc,
       tier: "Trajes", titulo: `${t.qtd} Trajes`,
       grande: String(t.qtd), unidade: "TRAJES",
-      sub: "Passo a passo com checklist",
-      itens: [`Passo a passo para ${t.qtd} trajes`, "Visuais masculinos e femininos", "Checklist para cada traje", "Download na hora"],
+      sub: "Masculinos e femininos",
+      itens: [`${t.qtd} trajes`, "Visuais masculinos e femininos", "Checklist para cada traje", "Download na hora"],
     };
   });
 
