@@ -12,6 +12,9 @@ window.LOJA = {
     intervaloStatus: 4000,      // ms entre cada consulta de status
   },
 
+  // Opcional no checkout, somado ao pacote. O que inclui está nos termos (item "Adicional de suporte").
+  adicional: { nome: "Adicional de suporte", preco: 15 },
+
   // Pacotes (conteúdo em PDF, ver termos). "meta" e "sub" são metas de progressão mostradas no card (não itens entregues).
   planos: [
     {

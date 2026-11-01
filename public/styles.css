@@ -245,6 +245,7 @@ button { font: inherit; color: inherit; cursor: pointer; background: none; borde
 .terms__body h4 { margin: 14px 0 4px; font-size: 13px; color: var(--text); }
 .terms__body p { margin: 0; }
 .accept { display: flex; gap: 10px; align-items: flex-start; margin: 0 0 14px; font-size: 13px; line-height: 1.45; color: #c8c9d6; cursor: pointer; }
+.accept--addon b { color: var(--c); }
 .accept input { flex: none; width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--money); cursor: pointer; }
 .form__error { margin: 0 0 10px; font-size: 13px; color: var(--red); }
 .form__error:empty { display: none; }

@@ -1,6 +1,6 @@
 // GET /api/download?id=<transação> — entrega o arquivo do pacote somente se o Pix estiver pago.
 const fs = require("fs");
-const { produtos, cashinpay, produtoDoId, arquivoDoProduto, pago, mesmoValor, valorDe } = require("./_lib");
+const { cashinpay, pedidoDoId, arquivoDoProduto, pago, mesmoValor, valorDe } = require("./_lib");
 
 const TIPOS = { zip: "application/zip", rar: "application/vnd.rar", "7z": "application/x-7z-compressed", pdf: "application/pdf", txt: "text/plain; charset=utf-8", json: "application/json", xml: "application/xml" };
 
@@ -15,15 +15,15 @@ module.exports = async (req, res) => {
   if (req.method !== "GET") return erro(res, 405, "Método não permitido");
 
   const id = String((req.query || {}).id || "");
-  const produto = produtoDoId(id);
-  const item = produto && produtos()[produto];
-  if (!item) return erro(res, 400, "Link de download inválido.");
+  const pedido = pedidoDoId(id);
+  if (!pedido) return erro(res, 400, "Link de download inválido.");
+  const { produto } = pedido;
 
   let tx;
   try { tx = await cashinpay("GET", `/transactions/${encodeURIComponent(id)}`); }
   catch (e) { console.error("[download]", e.message); return erro(res, 502, "Não foi possível verificar o pagamento agora."); }
 
-  if (!pago(tx.status) || !mesmoValor(valorDe(tx.amount), item.preco)) return erro(res, 403, "Pagamento não confirmado.");
+  if (!pago(tx.status) || !mesmoValor(valorDe(tx.amount), pedido.valor)) return erro(res, 403, "Pagamento não confirmado.");
 
   const arq = arquivoDoProduto(produto);
   if (!arq) return erro(res, 404, "Arquivo indisponível no momento.");

@@ -16,8 +16,11 @@ function produtos() {
   catalogo = {};
   L.planos.forEach((p) => p.preco != null && (catalogo[p.id] = { nome: p.nome, preco: p.preco }));
   L.trajes.forEach((t) => (catalogo[t.id] = { nome: `Pacote ${t.qtd} Trajes`, preco: t.preco }));
+  adicional = L.adicional || null;
   return catalogo;
 }
+let adicional;
+function precoAdicional() { produtos(); return adicional ? adicional.preco : null; }
 
 async function cashinpay(metodo, rota, body) {
   const key = process.env.CASHINPAY_API_KEY;
@@ -36,15 +39,19 @@ async function cashinpay(metodo, rota, body) {
   return json.data || {};
 }
 
-// ID da transação gerado por nós: tx_<produto>_<carimbo>. O produto sai do próprio ID,
-// então o servidor sabe o que foi comprado sem banco de dados.
-function novoId(produto) {
+// ID da transação gerado por nós: tx_<produto>_[sup_]<carimbo>. O produto e o adicional saem do
+// próprio ID, então o servidor sabe o que foi comprado (e o valor certo) sem banco de dados.
+function novoId(produto, comAdicional) {
   const rand = require("crypto").randomBytes(5).toString("hex");
-  return `tx_${produto}_${Date.now().toString(36)}${rand}`;
+  return `tx_${produto}_${comAdicional ? "sup_" : ""}${Date.now().toString(36)}${rand}`;
 }
-function produtoDoId(id) {
-  const m = /^tx_([a-z0-9-]+)_[a-z0-9]{8,30}$/.exec(String(id || ""));
-  return m ? m[1] : null;
+function pedidoDoId(id) {
+  const m = /^tx_([a-z0-9-]+)_(sup_)?[a-z0-9]{8,30}$/.exec(String(id || ""));
+  const item = m && produtos()[m[1]];
+  if (!item) return null;
+  const extra = m[2] ? precoAdicional() : 0;
+  if (extra == null) return null;
+  return { produto: m[1], item, adicional: !!m[2], valor: Math.round((item.preco + extra) * 100) / 100 };
 }
 
 // Arquivos privados: pasta /arquivos na raiz (fora de /public, então o site não os serve).
@@ -73,4 +80,4 @@ const pago = (s) => ["paid", "approved", "completed", "confirmed"].includes(Stri
 const mesmoValor = (a, b) => Math.abs(Number(a) - Number(b)) < 0.005;
 const valorDe = (amount) => (amount && typeof amount === "object" ? amount.value : amount);
 
-module.exports = { produtos, cashinpay, novoId, produtoDoId, arquivoDoProduto, linkDownload, pago, mesmoValor, valorDe };
+module.exports = { produtos, precoAdicional, cashinpay, novoId, pedidoDoId, arquivoDoProduto, linkDownload, pago, mesmoValor, valorDe };

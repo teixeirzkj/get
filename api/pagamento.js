@@ -1,6 +1,6 @@
 // POST /api/pagamento     → cria a cobrança Pix na CashinPay
 // GET  /api/pagamento?id= → consulta o status (e libera o download quando pago)
-const { produtos, cashinpay, novoId, produtoDoId, linkDownload, pago, mesmoValor, valorDe } = require("./_lib");
+const { produtos, precoAdicional, cashinpay, novoId, pedidoDoId, linkDownload, pago, mesmoValor, valorDe } = require("./_lib");
 
 const PLATAFORMAS = ["Steam", "Epic Games", "Rockstar Launcher", "Xbox App (PC)", "Xbox Series / One", "PS5"];
 
@@ -50,11 +50,14 @@ async function criar(req, res) {
   if (!cpfValido(cpf)) return res.status(400).json({ erro: "Informe um CPF válido." });
   if (b.aceiteTermos !== true) return res.status(400).json({ erro: "É preciso aceitar os termos." });
 
-  const id = novoId(b.produto);
+  const extra = b.adicional === true ? precoAdicional() : 0;
+  if (extra == null) return res.status(400).json({ erro: "Adicional indisponível." });
+  const valor = Math.round((item.preco + extra) * 100) / 100; // preço sempre do servidor
+  const id = novoId(b.produto, extra > 0);
   const tx = await cashinpay("POST", "/transactions", {
-    amount: item.preco, // preço sempre do servidor
+    amount: valor,
     transaction_id: id,
-    description: `Teixeira Mods | ${item.nome} | ${b.plataforma} | ${nick}`.slice(0, 140),
+    description: `Teixeira Mods | ${item.nome}${extra ? " + Adicional" : ""} | ${b.plataforma} | ${nick}`.slice(0, 140),
     customer: { name: nome, email, phone: telefone, document: cpf },
   });
 
@@ -62,21 +65,21 @@ async function criar(req, res) {
   return res.status(200).json({
     id, // consultas usam o nosso transaction_id
     copiaECola: pix.copy_paste || pix.qrcode,
-    valor: valorDe(tx.amount) ?? item.preco,
+    valor: valorDe(tx.amount) ?? valor,
   });
 }
 
 async function consultar(req, res) {
   const id = String((req.query || {}).id || "");
-  const produto = produtoDoId(id);
-  const item = produto && produtos()[produto];
-  if (!item) return res.status(400).json({ erro: "Consulta inválida." });
+  const pedido = pedidoDoId(id);
+  if (!pedido) return res.status(400).json({ erro: "Consulta inválida." });
+  const { produto } = pedido;
 
   const tx = await cashinpay("GET", `/transactions/${encodeURIComponent(id)}`);
 
   if (pago(tx.status)) {
     // confere se o valor pago é o do produto
-    if (!mesmoValor(valorDe(tx.amount), item.preco)) return res.status(403).json({ erro: "Pagamento não corresponde ao produto." });
+    if (!mesmoValor(valorDe(tx.amount), pedido.valor)) return res.status(403).json({ erro: "Pagamento não corresponde ao produto." });
     return res.status(200).json({ status: "paid", downloadUrl: linkDownload(produto, id) });
   }
   if (tx.status === "expired" || tx.status === "cancelled") return res.status(200).json({ status: "expired" });

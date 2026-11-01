@@ -96,6 +96,7 @@
     $("#orderTier").textContent = p.tier;
     $("#orderTitle").textContent = p.titulo;
     $("#orderPrice").textContent = p.preco != null ? brl(p.preco) : "Valor sob consulta";
+    $("#orderAddon").checked = false;
     $("#orderDesc").textContent = p.desc || "";
     $("#orderItems").innerHTML = p.itens.map((i) => `<li>${esc(i)}</li>`).join("");
     $("#formError").textContent = "";
@@ -126,6 +127,14 @@
     fecharTermos();
   });
 
+  /* adicional opcional: soma ao preço mostrado (o servidor recalcula) */
+  const addon = L.adicional;
+  if (addon) $("#orderAddonPrice").textContent = `+${brl(addon.preco)}`;
+  else $("#orderAddon").closest("label").hidden = true;
+  $("#orderAddon").addEventListener("change", (e) => {
+    if (atual && atual.preco != null) $("#orderPrice").textContent = brl(atual.preco + (e.target.checked && addon ? addon.preco : 0));
+  });
+
   $("#orderAccept").addEventListener("change", (e) => ($("#orderSend").disabled = !e.target.checked));
 
   form.addEventListener("submit", async (ev) => {
@@ -149,7 +158,7 @@
     const btn = $("#orderSend");
     btn.disabled = true; btn.textContent = "Gerando Pix…";
     try {
-      cobranca = await Pay.criar({ produto: atual.id, plataforma, nick, nome, email, telefone, cpf, aceiteTermos: true });
+      cobranca = await Pay.criar({ produto: atual.id, plataforma, nick, nome, email, telefone, cpf, adicional: !!(addon && $("#orderAddon").checked), aceiteTermos: true });
       cobranca.produto = atual.id;
       pendente.salvar({ id: cobranca.id, produto: atual.id, t: Date.now() });
       await mostrarPix(cobranca);
@@ -182,7 +191,7 @@
   });
 
   async function mostrarPix(c) {
-    $("#pixAmount").textContent = brl(c.valor != null ? c.valor : atual.preco);
+    $("#pixAmount").textContent = brl(c.valor != null ? c.valor : atual.preco + ($("#orderAddon").checked && addon ? addon.preco : 0));
     $("#pixCode").value = c.copiaECola || "";
     const box = $("#pixQr");
     if (c.qrCodeBase64) {
