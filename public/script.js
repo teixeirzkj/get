@@ -8,7 +8,7 @@
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
   $$(".js-discord").forEach((a) => (a.href = L.discord));
-  $("#year").textContent = new Date().getFullYear();
+  const ano = $("#year"); if (ano) ano.textContent = new Date().getFullYear();
 
   /* =========================================================
      PRODUTOS (planos + trajes) num formato único
@@ -47,7 +47,7 @@
       </span>
     </button>`;
 
-  $("#plans").innerHTML = L.planos.map((p, i) => tile(produtos[p.id], i)).join("") + `
+  if ($("#plans")) $("#plans").innerHTML = L.planos.map((p, i) => tile(produtos[p.id], i)).join("") + `
     <a class="tile tile--custom reveal js-discord" style="--d:.12s" href="${esc(L.discord)}" target="_blank" rel="noopener">
       <span class="tile__main">
         <span class="tile__tier">Suporte</span>
@@ -59,18 +59,16 @@
         <span class="tile__cta">Falar no Discord <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2"/></svg></span>
       </span>
     </a>`;
-  $("#outfits").innerHTML = L.trajes.map((t, i) => tile(produtos[t.id], i)).join("");
+  if ($("#outfits")) $("#outfits").innerHTML = L.trajes.map((t, i) => tile(produtos[t.id], i)).join("");
 
   /* =========================================================
-     PEDIDO PERSONALIZADO: /pedido?c=<link assinado pelo admin>
+     PEDIDO PERSONALIZADO (pedido.html): /pedido?c=<link assinado pelo admin>
      O navegador só lê o conteúdo para mostrar; o servidor confere a assinatura e o preço.
      ========================================================= */
   const tokenPedido = new URLSearchParams(location.search).get("c");
-  if (tokenPedido) {
-    document.documentElement.classList.add("is-pedido");
-    $("#pedido").hidden = false;
+  if ($("#pedido")) {
     let d = null;
-    try {
+    if (tokenPedido) try {
       const b = tokenPedido.split(".")[0].replace(/-/g, "+").replace(/_/g, "/");
       d = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(b), (c) => c.charCodeAt(0))));
       if (!d || !d.t || !Array.isArray(d.i) || !(d.p > 0) || (d.e && Date.now() > d.e)) d = null;
@@ -337,7 +335,7 @@
      ========================================================= */
   const nav = $("#nav");
   const burger = $(".nav__burger");
-  burger.addEventListener("click", () => { const o = nav.classList.toggle("is-open"); burger.setAttribute("aria-expanded", o); });
+  if (burger) burger.addEventListener("click", () => { const o = nav.classList.toggle("is-open"); burger.setAttribute("aria-expanded", o); });
   $$(".nav__links a").forEach((a) => a.addEventListener("click", () => { nav.classList.remove("is-open"); burger.setAttribute("aria-expanded", false); }));
 
   const sections = $$("main section[id]");

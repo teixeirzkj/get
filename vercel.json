@@ -7,12 +7,6 @@
     }
   },
   "outputDirectory": "public",
-  "rewrites": [
-    {
-      "source": "/pedido",
-      "destination": "/index.html"
-    }
-  ],
   "headers": [
     {
       "source": "/admin",

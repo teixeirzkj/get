@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="pt-BR" class="no-js">
 <head>
-  <script>document.documentElement.className = "js" + (/[?&]c=/.test(location.search) ? " is-pedido" : "");</script>
+  <script>document.documentElement.className = "js";</script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Teixeira Mods — GTA Online</title>
@@ -37,30 +37,6 @@
   </header>
 
   <main id="topo">
-    <!-- PEDIDO PERSONALIZADO (aparece só em /pedido?c=...) -->
-    <section class="pedido" id="pedido" hidden>
-      <div class="container pedido__inner">
-        <div class="pedido__card" id="pedidoCard">
-          <p class="label">Pacote personalizado</p>
-          <h1 class="pedido__title" id="pedidoTitulo"></h1>
-          <p class="pedido__desc" id="pedidoDesc"></p>
-          <p class="pedido__inc">O que está incluso</p>
-          <ul class="order__items" id="pedidoItens"></ul>
-          <div class="pedido__foot">
-            <p class="pedido__price" id="pedidoPreco"></p>
-            <button type="button" class="btn btn--primary btn--lg" data-produto="personalizado">Pagar com Pix</button>
-          </div>
-          <p class="pedido__note">Guia digital em PDF. Nada é entregue na sua conta. Dúvidas? <a href="#" class="js-discord" target="_blank" rel="noopener">Suporte no Discord</a></p>
-        </div>
-        <div class="pedido__card pedido__card--erro" id="pedidoErro" hidden>
-          <p class="label">Pacote personalizado</p>
-          <h1 class="pedido__title">Link inválido ou expirado</h1>
-          <p class="pedido__desc">Peça um novo link para o nosso suporte.</p>
-          <a href="#" class="btn btn--primary btn--lg js-discord" target="_blank" rel="noopener">Chamar no Discord</a>
-        </div>
-      </div>
-    </section>
-
     <!-- HERO -->
     <section class="hero">
       <div class="hero__bg" aria-hidden="true">

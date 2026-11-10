@@ -57,9 +57,9 @@ button { font: inherit; color: inherit; cursor: pointer; background: none; borde
 .btn:disabled { opacity: .35; cursor: not-allowed; }
 
 /* ---------- pedido personalizado (/pedido?c=...) ---------- */
-html.is-pedido main > :not(.pedido), html.is-pedido .nav__links, html.is-pedido .nav__burger, html.is-pedido .footer__links { display: none; }
-html.is-pedido .nav__inner > .btn { margin-left: auto; }
-.pedido { min-height: 100svh; display: grid; align-items: center; padding: 96px 0 48px; background: radial-gradient(ellipse 60% 60% at 80% 20%, rgba(47,134,255,.16), transparent 60%), var(--bg); }
+.pedido[hidden] { display: none; }
+.nav__sup { margin-left: auto; }
+.pedido { min-height: calc(100svh - 120px); display: grid; align-items: center; padding: 96px 0 48px; background: radial-gradient(ellipse 60% 60% at 80% 20%, rgba(47,134,255,.16), transparent 60%), var(--bg); }
 .pedido__inner { display: grid; justify-items: center; }
 .pedido__card { --c: var(--money); width: min(620px, 100%); padding: 32px 28px; background: var(--surface); border: 1px solid var(--line-2); border-top: 3px solid var(--money); border-radius: var(--r); }
 .pedido__card[hidden] { display: none; }

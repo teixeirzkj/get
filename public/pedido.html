@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="pt-BR" class="no-js">
+<head>
+  <script>document.documentElement.className = "js";</script>
+  <meta charset="utf-8" />
+  <meta name="robots" content="noindex" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Pacote personalizado — Teixeira Mods</title>
+  <meta name="theme-color" content="#05070d" />
+  <meta property="og:title" content="Pacote personalizado — Teixeira Mods" />
+  <meta property="og:image" content="/assets/logo-512.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/logo-32.png" />
+  <link rel="apple-touch-icon" href="/assets/logo-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Página do pacote personalizado: /pedido?c=<link gerado no /admin>.
+       O checkout (modais) é o mesmo de index.html: se mudar lá, copie aqui. -->
+  <header class="nav" id="nav">
+    <div class="container nav__inner">
+      <a href="/" class="logo" aria-label="Teixeira Mods — início">
+        <img class="logo__img" src="assets/logo-96.png" width="40" height="40" alt="" />
+        <span class="logo__text">TEIXEIRA<b>MODS</b></span>
+      </a>
+      <a class="btn btn--sm btn--line js-discord nav__sup" href="#" target="_blank" rel="noopener">Suporte</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="pedido" id="pedido">
+      <div class="container pedido__inner">
+        <div class="pedido__card" id="pedidoCard">
+          <p class="label">Pacote personalizado</p>
+          <h1 class="pedido__title" id="pedidoTitulo"></h1>
+          <p class="pedido__desc" id="pedidoDesc"></p>
+          <p class="pedido__inc">O que está incluso</p>
+          <ul class="order__items" id="pedidoItens"></ul>
+          <div class="pedido__foot">
+            <p class="pedido__price" id="pedidoPreco"></p>
+            <button type="button" class="btn btn--primary btn--lg" data-produto="personalizado">Pagar com Pix</button>
+          </div>
+          <p class="pedido__note">Guia digital em PDF. Nada é entregue na sua conta. Dúvidas? <a href="#" class="js-discord" target="_blank" rel="noopener">Suporte no Discord</a></p>
+        </div>
+        <div class="pedido__card pedido__card--erro" id="pedidoErro" hidden>
+          <p class="label">Pacote personalizado</p>
+          <h1 class="pedido__title">Link inválido ou expirado</h1>
+          <p class="pedido__desc">Peça um novo link para o nosso suporte.</p>
+          <a href="#" class="btn btn--primary btn--lg js-discord" target="_blank" rel="noopener">Chamar no Discord</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p class="footer__legal">Produtos digitais educativos: o conteúdo ensina a progredir usando os recursos do próprio jogo. Não entregamos dinheiro, level, veículos ou itens na sua conta, e os resultados dependem do seu tempo de jogo. Não somos afiliados, associados ou endossados pela Rockstar Games ou Take-Two Interactive. GTA, Grand Theft Auto e marcas relacionadas pertencem aos seus respectivos donos. © <span id="year"></span> Teixeira Mods.</p>
+    </div>
+  </footer>
+
+  <!-- MODAL: PACOTE + CHECKOUT -->
+  <div class="modal" id="orderModal" aria-hidden="true">
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__panel" role="dialog" aria-modal="true" aria-labelledby="orderTitle">
+      <button class="modal__close" data-close aria-label="Fechar">×</button>
+
+      <div class="order">
+        <!-- lado esquerdo: o que vem no pacote -->
+        <aside class="order__info" id="orderInfo">
+          <p class="label" id="orderTier">—</p>
+          <h3 id="orderTitle">—</h3>
+          <p class="order__price" id="orderPrice"></p>
+          <p class="order__desc" id="orderDesc"></p>
+          <p class="order__note">Guia digital em PDF. Nada é entregue na sua conta.</p>
+          <ul class="order__items" id="orderItems"></ul>
+        </aside>
+
+        <!-- lado direito: etapas de pagamento -->
+        <div class="order__flow">
+          <!-- 1. formulário -->
+          <form class="pane is-active" data-pane="form" id="orderForm" novalidate>
+            <p class="pane__title">Dados do pedido</p>
+            <div class="field-row">
+              <label class="field">
+                <span>Plataforma</span>
+                <select id="orderPlatform" required>
+                  <option value="" disabled selected>Selecione</option>
+                  <option>Steam</option><option>Epic Games</option><option>Rockstar Launcher</option>
+                  <option>Xbox App (PC)</option><option>Xbox Series / One</option><option>PS5</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Seu nick</span>
+                <input id="orderNick" type="text" maxlength="40" placeholder="Nick no jogo" autocomplete="off" required />
+              </label>
+            </div>
+            <p class="field-group">Dados para o Pix</p>
+            <label class="field">
+              <span>Nome completo</span>
+              <input id="orderName" type="text" maxlength="100" placeholder="Como no seu documento" autocomplete="name" required />
+            </label>
+            <div class="field-row">
+              <label class="field">
+                <span>E-mail</span>
+                <input id="orderEmail" type="email" maxlength="120" placeholder="voce@email.com" autocomplete="email" inputmode="email" required />
+              </label>
+              <label class="field">
+                <span>WhatsApp</span>
+                <input id="orderPhone" type="tel" maxlength="15" placeholder="(11) 99999-9999" autocomplete="tel-national" inputmode="numeric" required />
+              </label>
+            </div>
+            <label class="field">
+              <span>CPF</span>
+              <input id="orderCpf" type="text" maxlength="14" placeholder="000.000.000-00" inputmode="numeric" autocomplete="off" required />
+            </label>
+            <label class="accept accept--addon">
+              <input type="checkbox" id="orderAddon" />
+              <span>Adicional <b id="orderAddonPrice"></b></span>
+            </label>
+            <label class="accept">
+              <input type="checkbox" id="orderAccept" />
+              <span>Li e aceito os <button type="button" class="link" id="openTerms">termos de compra</button>.</span>
+            </label>
+            <p class="form__error" id="formError" role="alert"></p>
+            <button class="btn btn--primary btn--lg btn--block" id="orderSend" type="submit" disabled>Gerar pagamento</button>
+          </form>
+
+          <!-- 2. pix -->
+          <div class="pane" data-pane="pix" aria-live="polite">
+            <p class="pane__title">Pague com Pix</p>
+            <div class="pix">
+              <div class="pix__qr" id="pixQr"><span class="spinner" aria-hidden="true"></span></div>
+              <div class="pix__side">
+                <p class="pix__amount" id="pixAmount"></p>
+                <ol class="pix__how">
+                  <li>Abra o app do seu banco</li>
+                  <li>Escolha pagar com Pix</li>
+                  <li>Escaneie o QR Code ou cole o código</li>
+                </ol>
+              </div>
+            </div>
+            <label class="field">
+              <span>Pix copia e cola</span>
+              <div class="copy">
+                <input id="pixCode" type="text" readonly />
+                <button type="button" class="btn btn--primary" id="pixCopy">Copiar</button>
+              </div>
+            </label>
+            <div class="pix__status"><span class="spinner spinner--sm" aria-hidden="true"></span><span id="pixStatus">Aguardando pagamento…</span><span class="pix__timer" id="pixTimer"></span></div>
+          </div>
+
+          <!-- erro / expirado -->
+          <div class="pane" data-pane="error">
+            <p class="pane__title" id="errorTitle">Não foi possível gerar o pagamento</p>
+            <p class="paid__text" id="errorText">Tente novamente em instantes.</p>
+            <button type="button" class="btn btn--line btn--block" id="retryBtn">Tentar de novo</button>
+            <a href="#" class="btn btn--primary btn--block js-discord err__discord" target="_blank" rel="noopener">Chamar no Discord</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- termos (sobrepõe a janela) -->
+      <div class="termsbox" id="termsBox" role="dialog" aria-modal="true" aria-labelledby="termsTitle" hidden>
+        <div class="termsbox__head">
+          <p class="pane__title" id="termsTitle">Termos de compra</p>
+          <button type="button" class="modal__close termsbox__close" id="closeTerms" aria-label="Fechar termos">×</button>
+        </div>
+        <div class="terms__body" tabindex="0">
+          <h4>1. Objeto</h4>
+          <p>A compra dá acesso a um guia digital em PDF sobre progressão e personalização no GTA Online, correspondente ao pacote escolhido. O guia ensina o próprio cliente a progredir usando apenas atividades, menus e recursos oficiais do jogo.</p>
+          <p>Cada item listado no pacote (dinheiro, level, empresas, propriedades, carros, trajes, corrida etc.) corresponde a um capítulo do guia com a rota e o passo a passo de como juntar, comprar ou montar aquilo dentro do jogo.</p>
+          <h4>2. O que não está incluído</h4>
+          <p>Não entregamos dinheiro (GTA$), level/RP, veículos, roupas, propriedades, desbloqueios ou qualquer item na conta do cliente, e não acessamos nem operamos a conta. Valores como 30, 100, 200, 350 ou 500 milhões e levels citados nos pacotes são <b>metas de progressão</b> que o guia ajuda a buscar, não resultados garantidos.</p>
+          <h4>3. Resultados</h4>
+          <p>O tempo para atingir cada meta depende do tempo de jogo, do conteúdo liberado na conta, de eventos e bônus oficiais e de atualizações feitas pela desenvolvedora. Não há garantia de prazo ou de resultado.</p>
+          <h4>4. Entrega</h4>
+          <p>Após a confirmação do pagamento, o download do PDF é liberado no mesmo momento, na própria tela de compra. Em pacotes personalizados, o conteúdo é o descrito na página do pedido; quando o guia é preparado sob medida, ele é enviado pelo suporte no Discord.</p>
+          <h4>5. Pagamento</h4>
+          <p>O pagamento é feito por Pix, no valor apresentado no momento da compra, processado pela CashinPay. Pagamentos pendentes, cancelados ou expirados mantêm o download bloqueado.</p>
+          <h4>6. Direito de arrependimento</h4>
+          <p>Conforme o art. 49 do Código de Defesa do Consumidor, o cliente pode desistir da compra em até 7 dias a contar do pagamento, solicitando o reembolso pelo nosso suporte.</p>
+          <h4>7. Dados pessoais</h4>
+          <p>Nome, e-mail, telefone e CPF informados na compra são usados apenas para gerar e identificar o pagamento Pix e são compartilhados somente com o processador de pagamentos (CashinPay), conforme a LGPD. Nunca solicitamos senha, código de autenticação ou acesso à sua conta do jogo.</p>
+          <h4>8. Uso pessoal</h4>
+          <p>O guia é de uso pessoal do comprador. Não é permitido revender, redistribuir ou publicar o material.</p>
+          <h4>9. Atualizações do jogo</h4>
+          <p>Atualizações podem alterar menus, preços, atividades ou procedimentos, e algumas instruções podem exigir adaptação.</p>
+          <h4>10. Marcas</h4>
+          <p>Não temos vínculo com a Rockstar Games ou a Take-Two Interactive. GTA e marcas relacionadas pertencem aos seus respectivos donos.</p>
+          <h4>11. Suporte</h4>
+          <p>O suporte pelo Discord atende dúvidas sobre o pagamento, o download, o conteúdo do guia e pedidos de reembolso.</p>
+          <h4>12. Adicional de suporte</h4>
+          <p>O adicional de R$ 15,00 é opcional e pode ser marcado na tela de compra, somando-se ao valor do pacote. Ele dá direito a suporte individual pelo Discord para clientes que estão começando com uma conta do zero: orientação para criar a conta e o personagem e para aplicar o guia desde o início. O atendimento é feito por mensagens; não acessamos, operamos nem recebemos senha da conta do cliente. O adicional segue as mesmas regras de arrependimento e reembolso do item 6.</p>
+        </div>
+        <div class="termsbox__foot">
+          <button type="button" class="btn btn--line" id="backTerms">Voltar</button>
+          <button type="button" class="btn btn--primary" id="acceptTerms">Li e aceito</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- popup de download (abre quando o Pix é confirmado) -->
+  <div class="modal modal--dl" id="dlModal" aria-hidden="true">
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__panel" role="dialog" aria-modal="true" aria-labelledby="dlTitle">
+      <button class="modal__close" data-close aria-label="Fechar">×</button>
+      <div class="paid">
+        <span class="paid__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
+        </span>
+        <p class="pane__title" id="dlTitle">Pagamento confirmado</p>
+        <p class="label dl__produto" id="dlProduto"></p>
+        <p class="paid__text" id="dlText">Seu arquivo está pronto para download.</p>
+        <a class="btn btn--primary btn--lg btn--block" id="dlBtn" href="#" target="_blank" rel="noopener" download>Baixar arquivo</a>
+        <a class="btn btn--primary btn--lg btn--block js-discord" id="dlSuporte" href="#" target="_blank" rel="noopener" hidden>Chamar no Discord</a>
+        <p class="paid__hint">Dúvidas? <a href="#" class="js-discord" target="_blank" rel="noopener">Suporte no Discord</a></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="config.js"></script>
+  <script src="pagamento.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
