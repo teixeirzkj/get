@@ -28,6 +28,9 @@
     .ref td:last-child, .ref th:last-child { text-align: right; }
     .calc__sum { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 6px; padding-top: 14px; border-top: 1px solid var(--line); }
     .calc__val { font-family: var(--tech); font-size: 26px; font-weight: 700; color: var(--money); }
+    .calc__parts { margin: 4px 0 6px; }
+    .calc__parts td { color: var(--muted); }
+    .hint code { font-size: 11px; }
     .hint { margin: 10px 0 0; font-size: 12px; color: var(--muted); }
     .out { margin-top: 18px; padding: 16px; border: 1px solid var(--money); border-radius: var(--r); background: rgba(47,134,255,.08); }
     .out[hidden] { display: none; }
@@ -94,14 +97,19 @@
           <h2>Base de preço</h2>
           <div class="field-row">
             <label class="field"><span>Dinheiro (milhões)</span><input id="cMi" type="number" min="0" value="0" inputmode="numeric" /></label>
+            <label class="field"><span>Level</span><input id="cLevel" type="number" min="0" value="0" inputmode="numeric" /></label>
+          </div>
+          <div class="field-row">
+            <label class="field"><span>Carros</span><input id="cCarros" type="number" min="0" value="0" inputmode="numeric" /></label>
             <label class="field"><span>Trajes</span><input id="cTrajes" type="number" min="0" value="0" inputmode="numeric" /></label>
           </div>
-          <label class="field"><span>Carros</span><input id="cCarros" type="number" min="0" value="0" inputmode="numeric" /></label>
+          <label class="accept"><input type="checkbox" id="cExtras" /><span>Empresas, propriedades e corrida (como no pacote da mesma faixa de dinheiro)</span></label>
+          <table class="ref calc__parts"><tbody id="cParts"></tbody></table>
           <div class="calc__sum">
             <span class="calc__val" id="cTotal">R$ 0,00</span>
             <button type="button" class="btn btn--line btn--sm" id="usar">Usar no preço</button>
           </div>
-          <p class="hint">Dinheiro: proporcional aos pacotes atuais (inclui level, carros e trajes de cada faixa). Trajes e carros: avulsos, pelo preço dos pacotes de trajes. É só uma base, o preço final é de vocês.</p>
+          <p class="hint">Cada parte vale uma fração do preço do pacote equivalente (dinheiro 40%, level 20%, carros 15%, trajes 15%, extras 10%, ajustável em <code>basePreco</code> no config.js). Montar igual a um pacote dá o preço dele. É só uma base, o preço final é de vocês.</p>
         </section>
 
         <section class="box">

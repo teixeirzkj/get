@@ -15,10 +15,11 @@
 
   /* tabela de referência */
   $("#ref").innerHTML =
-    L.planos.map((p) => `<tr><td>${esc(p.nome)}</td><td>${p.meta} mi</td><td>${brl(p.preco)}</td></tr>`).join("") +
+    L.planos.map((p) => `<tr><td>${esc(p.nome)}</td><td>${p.meta} mi${p.level ? ` · Lv ${p.level}` : ""} · ${p.carros}c/${p.trajes}t</td><td>${brl(p.preco)}</td></tr>`).join("") +
     L.trajes.map((t) => `<tr><td>${t.qtd} Trajes</td><td>${t.qtd} trajes</td><td>${brl(t.preco)}</td></tr>`).join("");
 
-  /* base de preço: interpolação linear entre os pacotes atuais */
+  /* base de preço: cada parte vale uma fração (config basePreco) do preço do pacote equivalente,
+     achado por interpolação linear entre os pacotes atuais */
   const interp = (pts, x) => {
     if (!(x > 0)) return 0;
     pts = [...pts].sort((a, b) => a[0] - b[0]);
@@ -28,20 +29,28 @@
     const [x0, y0] = pts[i - 1], [x1, y1] = pts[i];
     return Math.max(y0 + ((y1 - y0) * (x - x0)) / (x1 - x0), 0);
   };
-  const ptsMi = L.planos.map((p) => [Number(p.meta), p.preco]);
-  const ptsTraje = L.trajes.map((t) => [t.qtd, t.preco]);
+  const pesos = L.basePreco || { dinheiro: 0.4, level: 0.2, carros: 0.15, trajes: 0.15, extras: 0.1 };
+  const pontos = (campo) => L.planos.filter((p) => p[campo] != null).map((p) => [Number(p[campo]), p.preco]);
+  const ptsMi = pontos("meta"), ptsLevel = pontos("level"), ptsCarros = pontos("carros"), ptsTrajes = pontos("trajes");
   const num = (sel) => Math.max(parseFloat($(sel).value) || 0, 0);
   let sugestao = 0;
   function calcular() {
-    const mi = num("#cMi"), trajes = num("#cTrajes"), carros = num("#cCarros");
-    sugestao = Math.round((interp(ptsMi, mi) + interp(ptsTraje, trajes) + interp(ptsTraje, carros)) * 100) / 100;
-    if (mi > 0) sugestao = Math.max(sugestao, 9.9);
+    const mi = num("#cMi"), level = num("#cLevel"), carros = num("#cCarros"), trajes = num("#cTrajes");
+    const partes = [
+      ["Dinheiro", interp(ptsMi, mi) * pesos.dinheiro],
+      ["Level", interp(ptsLevel, level) * pesos.level],
+      ["Carros", interp(ptsCarros, carros) * pesos.carros],
+      ["Trajes", interp(ptsTrajes, trajes) * pesos.trajes],
+      ["Empresas/propriedades/corrida", $("#cExtras").checked ? interp(ptsMi, mi || Number(L.planos[0].meta)) * pesos.extras : 0],
+    ].filter(([, v]) => v > 0);
+    sugestao = Math.round(partes.reduce((s, [, v]) => s + v, 0) * 100) / 100;
+    $("#cParts").innerHTML = partes.map(([n, v]) => `<tr><td>${n}</td><td>${brl(v)}</td></tr>`).join("");
     $("#cTotal").textContent = brl(sugestao);
   }
-  ["#cMi", "#cTrajes", "#cCarros"].forEach((s) => $(s).addEventListener("input", calcular));
+  ["#cMi", "#cLevel", "#cCarros", "#cTrajes", "#cExtras"].forEach((s) => $(s).addEventListener("input", calcular));
   $("#usar").addEventListener("click", () => {
     if (!sugestao) return;
-    $("#preco").value = (Math.ceil(sugestao) - 0.1).toFixed(2); // arredonda para ,90
+    $("#preco").value = Math.max(Math.ceil(sugestao) - 0.1, 5).toFixed(2); // arredonda para ,90
     previa();
   });
   calcular();
