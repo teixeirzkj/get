@@ -7,7 +7,7 @@ const TIPOS = { zip: "application/zip", rar: "application/vnd.rar", "7z": "appli
 const erro = (res, status, msg) => {
   res.statusCode = status;
   res.setHeader("Content-Type", "text/html; charset=utf-8");
-  res.end(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Download</title><body style="background:#08080d;color:#f1f1f5;font-family:system-ui;display:grid;place-items:center;min-height:100vh;margin:0;padding:16px;text-align:center"><div><h1 style="font-size:22px">${msg}</h1><p style="color:#8e8ea3">Se você já pagou, chame o suporte no Discord.</p><a href="/" style="color:#39ff88">Voltar ao site</a></div>`);
+  res.end(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Download</title><body style="background:#05070d;color:#f1f4fa;font-family:system-ui;display:grid;place-items:center;min-height:100vh;margin:0;padding:16px;text-align:center"><div><h1 style="font-size:22px">${msg}</h1><p style="color:#8a94ad">Se você já pagou, chame o suporte no Discord.</p><a href="/" style="color:#2f86ff">Voltar ao site</a></div>`);
 };
 
 module.exports = async (req, res) => {
@@ -17,7 +17,7 @@ module.exports = async (req, res) => {
   const id = String((req.query || {}).id || "");
   const pedido = pedidoDoId(id);
   if (!pedido) return erro(res, 400, "Link de download inválido.");
-  const { produto } = pedido;
+  const { produto, arquivo } = pedido;
 
   let tx;
   try { tx = await cashinpay("GET", `/transactions/${encodeURIComponent(id)}`); }
@@ -25,7 +25,7 @@ module.exports = async (req, res) => {
 
   if (!pago(tx.status) || !mesmoValor(valorDe(tx.amount), pedido.valor)) return erro(res, 403, "Pagamento não confirmado.");
 
-  const arq = arquivoDoProduto(produto);
+  const arq = arquivo && arquivoDoProduto(arquivo);
   if (!arq) return erro(res, 404, "Arquivo indisponível no momento.");
 
   const ext = arq.nome.split(".").pop().toLowerCase();
@@ -33,6 +33,6 @@ module.exports = async (req, res) => {
   res.statusCode = 200;
   res.setHeader("Content-Type", TIPOS[ext] || "application/octet-stream");
   res.setHeader("Content-Length", stat.size);
-  res.setHeader("Content-Disposition", `attachment; filename="TeixeiraMods-${produto}.${ext}"`);
+  res.setHeader("Content-Disposition", `attachment; filename="TeixeiraMods-${arquivo}.${ext}"`);
   fs.createReadStream(arq.caminho).pipe(res);
 };

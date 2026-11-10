@@ -1,16 +1,17 @@
 <!doctype html>
 <html lang="pt-BR" class="no-js">
 <head>
-  <script>document.documentElement.className = "js";</script>
+  <script>document.documentElement.className = "js" + (/[?&]c=/.test(location.search) ? " is-pedido" : "");</script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Teixeira Mods — GTA Online</title>
   <meta name="description" content="Progressão para GTA Online: dinheiro, level, carros e trajes, usando só o próprio jogo. Pague no Pix e baixe na hora." />
-  <meta name="theme-color" content="#08080d" />
+  <meta name="theme-color" content="#05070d" />
   <meta property="og:title" content="Teixeira Mods — GTA Online" />
-  <meta property="og:image" content="/assets/hero.webp" />
+  <meta property="og:image" content="/assets/logo-512.png" />
   <meta property="og:description" content="Progressão para GTA Online. Pague no Pix e baixe na hora." />
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%2308080d'/%3E%3Crect x='3' y='3' width='58' height='58' fill='none' stroke='%2339ff88' stroke-width='3'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' dominant-baseline='middle' font-family='Arial Black' font-size='28' fill='%2339ff88'%3ETX%3C/text%3E%3C/svg%3E" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/logo-32.png" />
+  <link rel="apple-touch-icon" href="/assets/logo-192.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -22,7 +23,7 @@
   <header class="nav" id="nav">
     <div class="container nav__inner">
       <a href="#topo" class="logo" aria-label="Teixeira Mods — início">
-        <span class="logo__mark">TX</span>
+        <img class="logo__img" src="assets/logo-96.png" width="40" height="40" alt="" />
         <span class="logo__text">TEIXEIRA<b>MODS</b></span>
       </a>
       <nav class="nav__links" aria-label="Principal">
@@ -36,6 +37,30 @@
   </header>
 
   <main id="topo">
+    <!-- PEDIDO PERSONALIZADO (aparece só em /pedido?c=...) -->
+    <section class="pedido" id="pedido" hidden>
+      <div class="container pedido__inner">
+        <div class="pedido__card" id="pedidoCard">
+          <p class="label">Pacote personalizado</p>
+          <h1 class="pedido__title" id="pedidoTitulo"></h1>
+          <p class="pedido__desc" id="pedidoDesc"></p>
+          <p class="pedido__inc">O que está incluso</p>
+          <ul class="order__items" id="pedidoItens"></ul>
+          <div class="pedido__foot">
+            <p class="pedido__price" id="pedidoPreco"></p>
+            <button type="button" class="btn btn--primary btn--lg" data-produto="personalizado">Pagar com Pix</button>
+          </div>
+          <p class="pedido__note">Guia digital em PDF. Nada é entregue na sua conta. Dúvidas? <a href="#" class="js-discord" target="_blank" rel="noopener">Suporte no Discord</a></p>
+        </div>
+        <div class="pedido__card pedido__card--erro" id="pedidoErro" hidden>
+          <p class="label">Pacote personalizado</p>
+          <h1 class="pedido__title">Link inválido ou expirado</h1>
+          <p class="pedido__desc">Peça um novo link para o nosso suporte.</p>
+          <a href="#" class="btn btn--primary btn--lg js-discord" target="_blank" rel="noopener">Chamar no Discord</a>
+        </div>
+      </div>
+    </section>
+
     <!-- HERO -->
     <section class="hero">
       <div class="hero__bg" aria-hidden="true">
@@ -128,7 +153,7 @@
 
   <footer class="footer">
     <div class="container footer__inner">
-      <a href="#topo" class="logo"><span class="logo__mark">TX</span><span class="logo__text">TEIXEIRA<b>MODS</b></span></a>
+      <a href="#topo" class="logo"><img class="logo__img" src="assets/logo-96.png" width="40" height="40" alt="" /><span class="logo__text">TEIXEIRA<b>MODS</b></span></a>
       <nav class="footer__links" aria-label="Rodapé">
         <a href="#planos">Pacotes</a><a href="#trajes">Trajes</a><a href="#" class="js-discord" target="_blank" rel="noopener">Suporte no Discord</a>
       </nav>
@@ -252,7 +277,7 @@
           <h4>3. Resultados</h4>
           <p>O tempo para atingir cada meta depende do tempo de jogo, do conteúdo liberado na conta, de eventos e bônus oficiais e de atualizações feitas pela desenvolvedora. Não há garantia de prazo ou de resultado.</p>
           <h4>4. Entrega</h4>
-          <p>Após a confirmação do pagamento, o download do PDF é liberado no mesmo momento, na própria tela de compra.</p>
+          <p>Após a confirmação do pagamento, o download do PDF é liberado no mesmo momento, na própria tela de compra. Em pacotes personalizados, o conteúdo é o descrito na página do pedido; quando o guia é preparado sob medida, ele é enviado pelo suporte no Discord.</p>
           <h4>5. Pagamento</h4>
           <p>O pagamento é feito por Pix, no valor apresentado no momento da compra, processado pela CashinPay. Pagamentos pendentes, cancelados ou expirados mantêm o download bloqueado.</p>
           <h4>6. Direito de arrependimento</h4>

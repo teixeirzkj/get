@@ -24,6 +24,7 @@ arquivos/elite.pdf       arquivos/trajes-5.pdf arquivos/trajes-10.pdf   arquivos
 |---|---|---|
 | `CASHINPAY_API_KEY` | sim | Chave `sk_live_...` (CashinPay → API REST → Gerar chave) |
 | `DOWNLOADS` | não | Só para arquivos grandes: `{"elite":"https://..."}` (usado quando o pacote não tem arquivo em `arquivos/`) |
+| `ADMIN_SENHA` | para o admin | Senha da página `/admin`. Também assina os links de pacote personalizado: trocar a senha invalida os links já enviados (ou defina `PEDIDO_SECRET` à parte para isso). |
 
 Depois de mudar variáveis, faça **Redeploy**.
 
@@ -33,6 +34,12 @@ Depois de mudar variáveis, faça **Redeploy**.
 - `GET /api/pagamento?id=` → consulta a CashinPay; quando `paid` e o valor bate, devolve o link de download.
 - `GET /api/download?id=` → reconfirma o pagamento e entrega o arquivo.
 - Sem `CASHINPAY_API_KEY`, o site mostra "pagamento indisponível" com botão para o Discord.
+
+## Pacotes personalizados (`/admin`)
+- Abra `/admin`, digite a senha (`ADMIN_SENHA`), monte o pacote (título, itens, preço, arquivo entregue) e gere o link.
+- O link (`/pedido?c=...`) é assinado: o cliente não consegue mudar preço nem itens. Vale pelos dias escolhidos.
+- "Base de preço" interpola os preços dos pacotes atuais de `config.js` (só referência).
+- Arquivo "Guia sob medida": o pagamento é confirmado e o cliente é orientado a chamar o suporte no Discord para receber.
 
 ## Testar a tela sem gateway
 Abra `public/index.html?demo` localmente. Gera um Pix fictício e "confirma" após ~8 s.

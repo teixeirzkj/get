@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Admin — Teixeira Mods</title>
+  <meta name="theme-color" content="#05070d" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/logo-32.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .adm { padding: 28px 0 64px; }
+    .adm__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 26px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+    .adm__head h1 { margin: 0; font-family: var(--tech); font-size: 15px; letter-spacing: .12em; text-transform: uppercase; }
+    .adm__grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; align-items: start; }
+    .box { padding: 24px 22px; background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r); }
+    .box + .box { margin-top: 20px; }
+    .box h2 { margin: 0 0 16px; font-family: var(--tech); font-size: 14px; letter-spacing: .12em; text-transform: uppercase; }
+    .field textarea { width: 100%; min-height: 150px; padding: 12px 14px; border-radius: var(--r); border: 1px solid var(--line-2); background: var(--bg); color: var(--text); font-family: var(--body); font-size: 15px; letter-spacing: 0; text-transform: none; resize: vertical; }
+    .field textarea:focus { outline: none; border-color: var(--money); }
+    .field small { font-family: var(--body); font-size: 12px; letter-spacing: 0; text-transform: none; color: var(--muted); font-weight: 400; }
+    .ref { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .ref th, .ref td { padding: 8px 6px; border-bottom: 1px solid var(--line); text-align: left; }
+    .ref th { font-family: var(--tech); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .ref td:last-child, .ref th:last-child { text-align: right; }
+    .calc__sum { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 6px; padding-top: 14px; border-top: 1px solid var(--line); }
+    .calc__val { font-family: var(--tech); font-size: 26px; font-weight: 700; color: var(--money); }
+    .hint { margin: 10px 0 0; font-size: 12px; color: var(--muted); }
+    .out { margin-top: 18px; padding: 16px; border: 1px solid var(--money); border-radius: var(--r); background: rgba(47,134,255,.08); }
+    .out[hidden] { display: none; }
+    .out input { width: 100%; height: 44px; padding: 0 12px; border-radius: var(--r); border: 1px solid var(--line-2); background: var(--bg); color: var(--text); font-size: 13px; }
+    .out__btns { display: flex; gap: 10px; margin-top: 10px; }
+    .out__btns .btn { flex: 1; }
+    .err { min-height: 20px; margin: 4px 0 10px; font-size: 13px; color: var(--red); }
+    .prev { margin: 0; padding: 0; list-style: none; }
+    .prev li { padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+    .prev__price { margin: 12px 0 0; font-family: var(--tech); font-size: 22px; font-weight: 700; color: var(--money); }
+    @media (max-width: 860px) { .adm__grid { grid-template-columns: 1fr; } }
+    @media (max-width: 520px) { .field-row { grid-template-columns: 1fr; } .box { padding: 20px 16px; } }
+  </style>
+</head>
+<body>
+  <main class="container adm">
+    <header class="adm__head">
+      <a href="/" class="logo"><img class="logo__img" src="assets/logo-96.png" width="40" height="40" alt="" /><span class="logo__text">TEIXEIRA<b>MODS</b></span></a>
+      <h1>Pacote personalizado</h1>
+    </header>
+
+    <div class="adm__grid">
+      <form class="box" id="form" novalidate>
+        <h2>Montar pacote</h2>
+        <label class="field"><span>Senha do admin</span>
+          <input id="senha" type="password" autocomplete="current-password" required />
+        </label>
+        <label class="field"><span>Título do pacote</span>
+          <input id="titulo" type="text" maxlength="60" placeholder="Ex.: Pacote do João" required />
+        </label>
+        <label class="field"><span>Descrição <small>(opcional)</small></span>
+          <input id="descricao" type="text" maxlength="300" placeholder="Uma linha sobre o pacote" />
+        </label>
+        <label class="field"><span>O que vai incluso <small>(um item por linha)</small></span>
+          <textarea id="itens" placeholder="150 milhões&#10;Level 200&#10;10 carros personalizados&#10;10 trajes"></textarea>
+        </label>
+        <div class="field-row">
+          <label class="field"><span>Arquivo entregue</span>
+            <select id="arquivo"></select>
+          </label>
+          <label class="field"><span>Link vale por (dias)</span>
+            <input id="validade" type="number" min="1" max="365" value="30" inputmode="numeric" />
+          </label>
+        </div>
+        <label class="field"><span>Preço final (R$)</span>
+          <input id="preco" type="number" min="5" step="0.01" placeholder="0,00" inputmode="decimal" required />
+        </label>
+        <p class="err" id="err" role="alert"></p>
+        <button class="btn btn--primary btn--lg btn--block" id="gerar" type="submit">Gerar link do cliente</button>
+
+        <div class="out" id="out" hidden>
+          <label class="field"><span>Link para mandar ao cliente</span>
+            <input id="link" type="text" readonly />
+          </label>
+          <div class="out__btns">
+            <button type="button" class="btn btn--primary" id="copiar">Copiar</button>
+            <a class="btn btn--line" id="abrir" href="#" target="_blank" rel="noopener">Abrir</a>
+          </div>
+        </div>
+      </form>
+
+      <div>
+        <section class="box">
+          <h2>Base de preço</h2>
+          <div class="field-row">
+            <label class="field"><span>Dinheiro (milhões)</span><input id="cMi" type="number" min="0" value="0" inputmode="numeric" /></label>
+            <label class="field"><span>Trajes</span><input id="cTrajes" type="number" min="0" value="0" inputmode="numeric" /></label>
+          </div>
+          <label class="field"><span>Carros</span><input id="cCarros" type="number" min="0" value="0" inputmode="numeric" /></label>
+          <div class="calc__sum">
+            <span class="calc__val" id="cTotal">R$ 0,00</span>
+            <button type="button" class="btn btn--line btn--sm" id="usar">Usar no preço</button>
+          </div>
+          <p class="hint">Dinheiro: proporcional aos pacotes atuais (inclui level, carros e trajes de cada faixa). Trajes e carros: avulsos, pelo preço dos pacotes de trajes. É só uma base, o preço final é de vocês.</p>
+        </section>
+
+        <section class="box">
+          <h2>Pacotes atuais</h2>
+          <table class="ref"><thead><tr><th>Pacote</th><th>Meta</th><th>Preço</th></tr></thead><tbody id="ref"></tbody></table>
+        </section>
+
+        <section class="box">
+          <h2>Prévia</h2>
+          <p class="label" id="pvTitulo">—</p>
+          <ul class="prev" id="pvItens"></ul>
+          <p class="prev__price" id="pvPreco"></p>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

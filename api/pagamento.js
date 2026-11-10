@@ -1,6 +1,6 @@
 // POST /api/pagamento     → cria a cobrança Pix na CashinPay
 // GET  /api/pagamento?id= → consulta o status (e libera o download quando pago)
-const { produtos, precoAdicional, cashinpay, novoId, pedidoDoId, linkDownload, pago, mesmoValor, valorDe } = require("./_lib");
+const { produtos, precoAdicional, cashinpay, novoId, pedidoDoId, lerToken, linkDownload, pago, mesmoValor, valorDe } = require("./_lib");
 
 const PLATAFORMAS = ["Steam", "Epic Games", "Rockstar Launcher", "Xbox App (PC)", "Xbox Series / One", "PS5"];
 
@@ -34,7 +34,15 @@ function cpfValido(cpf) {
 
 async function criar(req, res) {
   const b = req.body || {};
-  const item = produtos()[b.produto];
+  let item = produtos()[b.produto];
+  let idProduto = b.produto;
+  if (b.produto === "personalizado") {
+    // preço e conteúdo vêm do link assinado pelo admin, nunca do navegador
+    const pers = lerToken(b.token);
+    if (!pers) return res.status(400).json({ erro: "Este link de pedido é inválido ou expirou. Chame o suporte no Discord." });
+    item = { nome: `Personalizado: ${pers.t}`, preco: pers.p / 100 };
+    idProduto = `p${pers.p}-${pers.a}`;
+  }
   const nick = String(b.nick || "").trim().slice(0, 40);
   const nome = String(b.nome || "").trim().replace(/\s+/g, " ").slice(0, 100);
   const email = String(b.email || "").trim().toLowerCase().slice(0, 120);
@@ -53,7 +61,7 @@ async function criar(req, res) {
   const extra = b.adicional === true ? precoAdicional() : 0;
   if (extra == null) return res.status(400).json({ erro: "Adicional indisponível." });
   const valor = Math.round((item.preco + extra) * 100) / 100; // preço sempre do servidor
-  const id = novoId(b.produto, extra > 0);
+  const id = novoId(idProduto, extra > 0);
   const tx = await cashinpay("POST", "/transactions", {
     amount: valor,
     transaction_id: id,
@@ -73,14 +81,14 @@ async function consultar(req, res) {
   const id = String((req.query || {}).id || "");
   const pedido = pedidoDoId(id);
   if (!pedido) return res.status(400).json({ erro: "Consulta inválida." });
-  const { produto } = pedido;
+  const { arquivo } = pedido;
 
   const tx = await cashinpay("GET", `/transactions/${encodeURIComponent(id)}`);
 
   if (pago(tx.status)) {
     // confere se o valor pago é o do produto
     if (!mesmoValor(valorDe(tx.amount), pedido.valor)) return res.status(403).json({ erro: "Pagamento não corresponde ao produto." });
-    return res.status(200).json({ status: "paid", downloadUrl: linkDownload(produto, id) });
+    return res.status(200).json({ status: "paid", downloadUrl: linkDownload(arquivo, id) });
   }
   if (tx.status === "expired" || tx.status === "cancelled") return res.status(200).json({ status: "expired" });
   return res.status(200).json({ status: "pending" });

@@ -62,6 +62,37 @@
   $("#outfits").innerHTML = L.trajes.map((t, i) => tile(produtos[t.id], i)).join("");
 
   /* =========================================================
+     PEDIDO PERSONALIZADO: /pedido?c=<link assinado pelo admin>
+     O navegador só lê o conteúdo para mostrar; o servidor confere a assinatura e o preço.
+     ========================================================= */
+  const tokenPedido = new URLSearchParams(location.search).get("c");
+  if (tokenPedido) {
+    document.documentElement.classList.add("is-pedido");
+    $("#pedido").hidden = false;
+    let d = null;
+    try {
+      const b = tokenPedido.split(".")[0].replace(/-/g, "+").replace(/_/g, "/");
+      d = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(b), (c) => c.charCodeAt(0))));
+      if (!d || !d.t || !Array.isArray(d.i) || !(d.p > 0) || (d.e && Date.now() > d.e)) d = null;
+    } catch (_) { d = null; }
+    if (d) {
+      produtos.personalizado = {
+        id: "personalizado", cor: "green", preco: d.p / 100, desc: d.d || "", token: tokenPedido,
+        tier: "Pacote personalizado", titulo: d.t, itens: d.i,
+      };
+      document.title = `${d.t} — Teixeira Mods`;
+      $("#pedidoTitulo").textContent = d.t;
+      $("#pedidoDesc").textContent = d.d || "";
+      $("#pedidoDesc").hidden = !d.d;
+      $("#pedidoItens").innerHTML = d.i.map((i) => `<li>${esc(i)}</li>`).join("");
+      $("#pedidoPreco").textContent = brl(d.p / 100);
+    } else {
+      $("#pedidoCard").hidden = true;
+      $("#pedidoErro").hidden = false;
+    }
+  }
+
+  /* =========================================================
      CAMADAS (modal)
      ========================================================= */
   let lastFocus = null;
@@ -158,9 +189,10 @@
     const btn = $("#orderSend");
     btn.disabled = true; btn.textContent = "Gerando Pix…";
     try {
-      cobranca = await Pay.criar({ produto: atual.id, plataforma, nick, nome, email, telefone, cpf, adicional: !!(addon && $("#orderAddon").checked), aceiteTermos: true });
+      cobranca = await Pay.criar({ produto: atual.id, plataforma, nick, nome, email, telefone, cpf, adicional: !!(addon && $("#orderAddon").checked), token: atual.token, aceiteTermos: true });
       cobranca.produto = atual.id;
-      pendente.salvar({ id: cobranca.id, produto: atual.id, t: Date.now() });
+      cobranca.titulo = atual.titulo; cobranca.cor = atual.cor;
+      pendente.salvar({ id: cobranca.id, produto: atual.id, titulo: atual.titulo, cor: atual.cor, t: Date.now() });
       await mostrarPix(cobranca);
       pane("pix");
       iniciarStatus();
@@ -240,7 +272,7 @@
       const r = await Pay.status(cobranca.id, cobranca.produto);
       if (r.status === "paid") {
         pararStatus(); pendente.limpar();
-        mostrarDownload(cobranca.produto, r.downloadUrl);
+        mostrarDownload(cobranca, r.downloadUrl);
         cobranca = null;
       } else if (r.status === "expired") {
         pararStatus(); pendente.limpar();
@@ -256,8 +288,8 @@
   }
   document.addEventListener("visibilitychange", () => { if (!document.hidden) verificar(); });
 
-  function mostrarDownload(produtoId, url) {
-    const p = produtos[produtoId];
+  function mostrarDownload(c, url) {
+    const p = produtos[c.produto] || (c.titulo ? { titulo: c.titulo, cor: c.cor || "green" } : null);
     dlModal.dataset.cor = p ? p.cor : "green";
     $("#dlProduto").textContent = p ? p.titulo : "";
     const btn = $("#dlBtn"), sup = $("#dlSuporte");
@@ -275,7 +307,7 @@
 
   // retoma um Pix pendente (ex.: cliente voltou do app do banco e a página recarregou)
   const salvo = pendente.ler();
-  if (salvo && produtos[salvo.produto]) { cobranca = { id: salvo.id, produto: salvo.produto }; verificar(); iniciarStatus(); }
+  if (salvo && (produtos[salvo.produto] || salvo.titulo)) { cobranca = { id: salvo.id, produto: salvo.produto, titulo: salvo.titulo, cor: salvo.cor }; verificar(); iniciarStatus(); }
   function pararStatus(limparTimer = true) {
     clearInterval(poll); poll = null;
     if (limparTimer) clearInterval(timer);
