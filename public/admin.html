@@ -41,7 +41,19 @@
     .prev { margin: 0; padding: 0; list-style: none; }
     .prev li { padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
     .prev__price { margin: 12px 0 0; font-family: var(--tech); font-size: 22px; font-weight: 700; color: var(--money); }
-    @media (max-width: 860px) { .adm__grid { grid-template-columns: 1fr; } }
+    .adm__senha { width: min(260px, 50%); margin: 0; }
+    .tabs { display: flex; gap: 6px; margin-bottom: 20px; border-bottom: 1px solid var(--line); }
+    .tab { padding: 12px 16px; font-family: var(--tech); font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+    .tab.is-on { color: var(--text); border-color: var(--money); }
+    .aba[hidden] { display: none; }
+    #loja .box { margin-top: 0; margin-bottom: 20px; }
+    .pesos { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0 10px; }
+    .ed__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0 10px; }
+    .ed__grid--2 { grid-template-columns: 2fr 1fr 1fr; }
+    .savebar { position: sticky; bottom: 0; display: flex; align-items: center; justify-content: flex-end; gap: 16px; padding: 14px 0; background: linear-gradient(0deg, var(--bg) 70%, transparent); }
+    .savebar .err, .savebar .ok { margin: 0; flex: 1; }
+    .ok { font-size: 13px; color: var(--money); }
+    @media (max-width: 860px) { .adm__grid { grid-template-columns: 1fr; } .pesos, .ed__grid { grid-template-columns: 1fr 1fr; } .ed__grid--2 { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 520px) { .field-row { grid-template-columns: 1fr; } .box { padding: 20px 16px; } }
   </style>
 </head>
@@ -49,15 +61,19 @@
   <main class="container adm">
     <header class="adm__head">
       <a href="/" class="logo"><img class="logo__img" src="assets/logo-96.png" width="40" height="40" alt="" /><span class="logo__text">TEIXEIRA<b>MODS</b></span></a>
-      <h1>Pacote personalizado</h1>
+      <label class="field adm__senha"><span>Senha do admin</span>
+        <input id="senha" type="password" autocomplete="current-password" required />
+      </label>
     </header>
 
-    <div class="adm__grid">
+    <div class="tabs" role="tablist">
+      <button type="button" class="tab is-on" role="tab" aria-selected="true" data-aba="pers">Pacote personalizado</button>
+      <button type="button" class="tab" role="tab" aria-selected="false" data-aba="loja">Editar loja</button>
+    </div>
+
+    <div class="adm__grid aba" data-aba="pers">
       <form class="box" id="form" novalidate>
         <h2>Montar pacote</h2>
-        <label class="field"><span>Senha do admin</span>
-          <input id="senha" type="password" autocomplete="current-password" required />
-        </label>
         <label class="field"><span>Título do pacote</span>
           <input id="titulo" type="text" maxlength="60" placeholder="Ex.: Pacote do João" required />
         </label>
@@ -109,7 +125,7 @@
             <span class="calc__val" id="cTotal">R$ 0,00</span>
             <button type="button" class="btn btn--line btn--sm" id="usar">Usar no preço</button>
           </div>
-          <p class="hint">Cada parte vale uma fração do preço do pacote equivalente (dinheiro 40%, level 20%, carros 15%, trajes 15%, extras 10%, ajustável em <code>basePreco</code> no config.js). Montar igual a um pacote dá o preço dele. É só uma base, o preço final é de vocês.</p>
+          <p class="hint">Cada parte vale uma fração do preço do pacote equivalente (ajustável na aba "Editar loja"). Montar igual a um pacote dá o preço dele. É só uma base, o preço final é de vocês.</p>
         </section>
 
         <section class="box">
@@ -125,6 +141,27 @@
         </section>
       </div>
     </div>
+
+    <!-- EDITAR LOJA: preços e textos (salva public/config.js no GitHub) -->
+    <form class="aba" data-aba="loja" id="loja" novalidate hidden>
+      <section class="box">
+        <h2>Geral</h2>
+        <label class="field"><span>Link do Discord</span><input id="eDiscord" type="url" maxlength="200" /></label>
+        <div class="field-row">
+          <label class="field"><span>Nome do adicional</span><input id="eAdNome" type="text" maxlength="40" /></label>
+          <label class="field"><span>Preço do adicional (R$)</span><input id="eAdPreco" type="number" min="1" step="0.01" inputmode="decimal" /></label>
+        </div>
+        <p class="field-group">Base de preço (% do pacote que cada parte vale, somando 100)</p>
+        <div class="pesos" id="ePesos"></div>
+      </section>
+      <div id="ePlanos"></div>
+      <div id="eTrajes"></div>
+      <div class="savebar">
+        <p class="err" id="eErr" role="alert"></p>
+        <p class="ok" id="eOk" role="status"></p>
+        <button class="btn btn--primary btn--lg" id="salvar" type="submit">Salvar alterações</button>
+      </div>
+    </form>
   </main>
 
   <script src="config.js"></script>

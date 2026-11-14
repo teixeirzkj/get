@@ -25,6 +25,7 @@ arquivos/elite.pdf       arquivos/trajes-5.pdf arquivos/trajes-10.pdf   arquivos
 | `CASHINPAY_API_KEY` | sim | Chave `sk_live_...` (CashinPay → API REST → Gerar chave) |
 | `DOWNLOADS` | não | Só para arquivos grandes: `{"elite":"https://..."}` (usado quando o pacote não tem arquivo em `arquivos/`) |
 | `ADMIN_SENHA` | para o admin | Senha da página `/admin`. Também assina os links de pacote personalizado: trocar a senha invalida os links já enviados (ou defina `PEDIDO_SECRET` à parte para isso). |
+| `GITHUB_TOKEN` | para editar a loja | Token do GitHub (fine-grained) só do repositório `teixeirzkj/get`, permissão **Contents: Read and write**. Usado pela aba "Editar loja" do `/admin` para salvar `public/config.js`. |
 
 Depois de mudar variáveis, faça **Redeploy**.
 
@@ -34,6 +35,12 @@ Depois de mudar variáveis, faça **Redeploy**.
 - `GET /api/pagamento?id=` → consulta a CashinPay; quando `paid` e o valor bate, devolve o link de download.
 - `GET /api/download?id=` → reconfirma o pagamento e entrega o arquivo.
 - Sem `CASHINPAY_API_KEY`, o site mostra "pagamento indisponível" com botão para o Discord.
+
+## Editar preços e textos (`/admin` → Editar loja)
+- Muda nome, preço, destaque, metas, textos e itens dos pacotes, trajes, adicional, link do Discord e base de preço.
+- Ao salvar, o painel faz um commit de `public/config.js` no GitHub e a Vercel publica em ~1 minuto.
+- Os ids dos pacotes não mudam (são os nomes dos PDFs em `arquivos/`).
+- Quem editar o código localmente deve dar `git pull` antes, para pegar as alterações feitas pelo painel.
 
 ## Pacotes personalizados (`/admin`)
 - Abra `/admin`, digite a senha (`ADMIN_SENHA`), monte o pacote (título, itens, preço, arquivo entregue) e gere o link.

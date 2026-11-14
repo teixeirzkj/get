@@ -4,8 +4,15 @@
   const brl = (v) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-  // senha lembrada só nesta aba
+  // senha lembrada só nesta aba do navegador
   try { $("#senha").value = sessionStorage.getItem("tm_admin") || ""; } catch (_) {}
+  const lembrarSenha = () => { try { sessionStorage.setItem("tm_admin", $("#senha").value); } catch (_) {} };
+
+  /* abas */
+  document.querySelectorAll(".tab").forEach((b) => b.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach((t) => { t.classList.toggle("is-on", t === b); t.setAttribute("aria-selected", t === b); });
+    document.querySelectorAll(".aba").forEach((a) => (a.hidden = a.dataset.aba !== b.dataset.aba));
+  }));
 
   /* arquivo entregue: PDF de um pacote existente ou guia sob medida pelo suporte */
   $("#arquivo").innerHTML =
@@ -88,7 +95,7 @@
       });
       const j = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(j.erro || `Erro ${r.status}`);
-      try { sessionStorage.setItem("tm_admin", $("#senha").value); } catch (_) {}
+      lembrarSenha();
       const url = location.origin + j.url;
       $("#link").value = url;
       $("#abrir").href = url;
@@ -97,6 +104,84 @@
       err.textContent = ex.message;
     } finally {
       btn.disabled = false; btn.textContent = "Gerar link do cliente";
+    }
+  });
+
+  /* =========================================================
+     EDITAR LOJA: monta o formulário a partir do config.js atual
+     ========================================================= */
+  const v = (x) => (x == null ? "" : esc(x));
+  const pesoNomes = { dinheiro: "Dinheiro", level: "Level", carros: "Carros", trajes: "Trajes", extras: "Extras" };
+  $("#eDiscord").value = L.discord || "";
+  $("#eAdNome").value = (L.adicional && L.adicional.nome) || "";
+  $("#eAdPreco").value = (L.adicional && L.adicional.preco) || "";
+  $("#ePesos").innerHTML = Object.keys(pesoNomes).map((k) =>
+    `<label class="field"><span>${pesoNomes[k]} %</span><input type="number" min="0" max="100" step="1" data-peso="${k}" value="${Math.round(((L.basePreco || {})[k] || 0) * 100)}" inputmode="numeric" /></label>`).join("");
+
+  $("#ePlanos").innerHTML = L.planos.map((p) => `
+    <section class="box" data-plano="${p.id}">
+      <h2>${esc(p.nome)}</h2>
+      <div class="ed__grid ed__grid--2">
+        <label class="field"><span>Nome</span><input data-k="nome" type="text" maxlength="40" value="${v(p.nome)}" /></label>
+        <label class="field"><span>Preço (R$)</span><input data-k="preco" type="number" min="1" step="0.01" value="${v(p.preco)}" inputmode="decimal" /></label>
+        <label class="field"><span>Destaque</span><input data-k="destaque" type="text" maxlength="20" placeholder="ex.: Mais vendido" value="${v(p.destaque)}" /></label>
+      </div>
+      <div class="ed__grid">
+        <label class="field"><span>Meta (mi)</span><input data-k="meta" type="number" min="0" value="${v(p.meta)}" inputmode="numeric" /></label>
+        <label class="field"><span>Level</span><input data-k="level" type="number" min="0" placeholder="sem level" value="${v(p.level)}" inputmode="numeric" /></label>
+        <label class="field"><span>Carros</span><input data-k="carros" type="number" min="0" value="${v(p.carros)}" inputmode="numeric" /></label>
+        <label class="field"><span>Trajes</span><input data-k="trajes" type="number" min="0" value="${v(p.trajes)}" inputmode="numeric" /></label>
+      </div>
+      <label class="field"><span>Texto do card <small>(abaixo do número)</small></span><input data-k="sub" type="text" maxlength="80" value="${v(p.sub)}" /></label>
+      <label class="field"><span>Descrição</span><input data-k="desc" type="text" maxlength="300" value="${v(p.desc)}" /></label>
+      <label class="field"><span>Itens <small>(um por linha)</small></span><textarea data-k="itens">${esc((p.itens || []).join("\n"))}</textarea></label>
+    </section>`).join("");
+
+  $("#eTrajes").innerHTML = `<section class="box"><h2>Trajes</h2>` + L.trajes.map((t) => `
+      <div data-traje="${t.id}">
+        <div class="ed__grid">
+          <label class="field"><span>Quantidade</span><input data-k="qtd" type="number" min="1" value="${v(t.qtd)}" inputmode="numeric" /></label>
+          <label class="field"><span>Preço (R$)</span><input data-k="preco" type="number" min="1" step="0.01" value="${v(t.preco)}" inputmode="decimal" /></label>
+          <label class="field" style="grid-column: span 2"><span>Destaque</span><input data-k="destaque" type="text" maxlength="20" value="${v(t.destaque)}" /></label>
+        </div>
+        <label class="field"><span>Descrição</span><input data-k="desc" type="text" maxlength="300" value="${v(t.desc)}" /></label>
+      </div>`).join('<hr style="border:0;border-top:1px solid var(--line);margin:8px 0 18px" />') + "</section>";
+
+  const campo = (el, k) => el.querySelector(`[data-k="${k}"]`).value;
+  $("#loja").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const err = $("#eErr"), ok = $("#eOk"), btn = $("#salvar");
+    err.textContent = ""; ok.textContent = "";
+    const basePreco = {};
+    document.querySelectorAll("[data-peso]").forEach((i) => (basePreco[i.dataset.peso] = (parseFloat(i.value) || 0) / 100));
+    const somaPesos = Math.round(Object.values(basePreco).reduce((s, x) => s + x, 0) * 100);
+    if (somaPesos !== 100) { err.textContent = `Base de preço soma ${somaPesos}%, precisa somar 100%.`; return; }
+    const dados = {
+      discord: $("#eDiscord").value,
+      adicional: { nome: $("#eAdNome").value, preco: parseFloat($("#eAdPreco").value) },
+      basePreco,
+      planos: [...document.querySelectorAll("[data-plano]")].map((el) => ({
+        id: el.dataset.plano,
+        nome: campo(el, "nome"), preco: campo(el, "preco"), destaque: campo(el, "destaque"),
+        meta: campo(el, "meta"), level: campo(el, "level"), carros: campo(el, "carros"), trajes: campo(el, "trajes"),
+        sub: campo(el, "sub"), desc: campo(el, "desc"),
+        itens: campo(el, "itens").split("\n").map((s) => s.trim()).filter(Boolean),
+      })),
+      trajes: [...document.querySelectorAll("[data-traje]")].map((el) => ({
+        id: el.dataset.traje, qtd: campo(el, "qtd"), preco: campo(el, "preco"), destaque: campo(el, "destaque"), desc: campo(el, "desc"),
+      })),
+    };
+    btn.disabled = true; btn.textContent = "Salvando…";
+    try {
+      const r = await fetch("/api/loja", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ senha: $("#senha").value, dados }) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(j.erro || `Erro ${r.status}`);
+      lembrarSenha();
+      ok.textContent = j.semMudanca ? "Nada mudou." : "Salvo! O site atualiza em cerca de 1 minuto.";
+    } catch (ex) {
+      err.textContent = ex.message;
+    } finally {
+      btn.disabled = false; btn.textContent = "Salvar alterações";
     }
   });
 
