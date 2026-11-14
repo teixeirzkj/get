@@ -2,7 +2,7 @@
 // GET  /api/pagamento?id= → consulta o status (e libera o download quando pago)
 const { produtos, precoAdicional, cashinpay, novoId, pedidoDoId, lerToken, linkDownload, pago, mesmoValor, valorDe } = require("./_lib");
 
-const PLATAFORMAS = ["Steam", "Epic Games", "Rockstar Launcher", "Xbox App (PC)", "Xbox Series / One", "PS5"];
+const PLATAFORMAS = ["Steam", "Epic Games", "Rockstar Launcher", "Xbox App (PC)", "Xbox Series / One", "PS4", "PS5"];
 
 module.exports = async (req, res) => {
   res.setHeader("Cache-Control", "no-store");
