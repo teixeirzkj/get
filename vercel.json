@@ -2,7 +2,7 @@
   "cleanUrls": true,
   "functions": {
     "api/*.js": {
-      "includeFiles": "{public/config.js,arquivos/**}",
+      "includeFiles": "{public/config.js,arquivos/**,cupons.json}",
       "maxDuration": 30
     }
   },

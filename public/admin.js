@@ -185,6 +185,63 @@
     }
   });
 
+  /* =========================================================
+     CUPONS
+     ========================================================= */
+  const opcoesPacote = [["", "Todos os pacotes"], ...L.planos.map((p) => [p.id, p.nome]), ...L.trajes.map((t) => [t.id, `${t.qtd} Trajes`]), ["personalizado", "Pacotes personalizados"]];
+  function linhaCupom(c = { codigo: "", tipo: "percentual", valor: 10, ativo: true, validade: "", pacotes: [] }) {
+    const div = document.createElement("div");
+    div.className = "cup";
+    const pac = (c.pacotes && c.pacotes[0]) || "";
+    div.innerHTML = `
+      <label class="field"><span>Código</span><input data-c="codigo" type="text" maxlength="20" value="${v(c.codigo)}" placeholder="BEMVINDO10" style="text-transform:uppercase" /></label>
+      <label class="field"><span>Tipo</span><select data-c="tipo"><option value="percentual"${c.tipo !== "valor" ? " selected" : ""}>% do pacote</option><option value="valor"${c.tipo === "valor" ? " selected" : ""}>R$ fixo</option></select></label>
+      <label class="field"><span>Desconto</span><input data-c="valor" type="number" min="0.01" step="0.01" value="${v(c.valor)}" inputmode="decimal" /></label>
+      <label class="field"><span>Válido até</span><input data-c="validade" type="date" value="${v(c.validade)}" /></label>
+      <label class="field"><span>Vale para</span><select data-c="pacote">${opcoesPacote.map(([id, n]) => `<option value="${id}"${id === pac ? " selected" : ""}>${esc(n)}</option>`).join("")}</select></label>
+      <label class="accept"><input data-c="ativo" type="checkbox"${c.ativo !== false ? " checked" : ""} /><span>Ativo</span></label>
+      <button type="button" class="cup__rm" aria-label="Remover cupom" title="Remover">×</button>`;
+    div.querySelector(".cup__rm").addEventListener("click", () => { div.remove(); $("#cVazio").hidden = !!$("#cLista").children.length; });
+    $("#cLista").appendChild(div);
+    $("#cVazio").hidden = true;
+  }
+  async function apiCupons(corpo) {
+    const r = await fetch("/api/cupons", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ senha: $("#senha").value, ...corpo }) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.erro || `Erro ${r.status}`);
+    lembrarSenha();
+    return j;
+  }
+  async function carregarCupons() {
+    $("#cErr").textContent = ""; $("#cOk").textContent = "";
+    try {
+      const j = await apiCupons({ acao: "listar" });
+      $("#cLista").innerHTML = "";
+      j.cupons.forEach((c) => linhaCupom(c));
+      $("#cVazio").hidden = j.cupons.length > 0;
+      if (j.somenteLeitura) $("#cOk").textContent = "Configure o GITHUB_TOKEN para poder salvar.";
+    } catch (ex) { $("#cErr").textContent = ex.message; }
+  }
+  $("#cCarregar").addEventListener("click", carregarCupons);
+  $("#cNovo").addEventListener("click", () => linhaCupom());
+  document.querySelector('.tab[data-aba="cupons"]').addEventListener("click", () => { if ($("#senha").value && !$("#cLista").children.length) carregarCupons(); });
+  $("#cupons").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = $("#cSalvar");
+    $("#cErr").textContent = ""; $("#cOk").textContent = "";
+    const q = (el, k) => el.querySelector(`[data-c="${k}"]`);
+    const cupons = [...$("#cLista").children].map((el) => ({
+      codigo: q(el, "codigo").value, tipo: q(el, "tipo").value, valor: parseFloat(q(el, "valor").value),
+      validade: q(el, "validade").value, ativo: q(el, "ativo").checked, pacotes: q(el, "pacote").value ? [q(el, "pacote").value] : [],
+    }));
+    btn.disabled = true; btn.textContent = "Salvando…";
+    try {
+      await apiCupons({ acao: "salvar", cupons });
+      $("#cOk").textContent = "Salvo! Os cupons passam a valer em cerca de 1 minuto.";
+    } catch (ex) { $("#cErr").textContent = ex.message; }
+    finally { btn.disabled = false; btn.textContent = "Salvar cupons"; }
+  });
+
   $("#copiar").addEventListener("click", async () => {
     const v = $("#link").value;
     try { await navigator.clipboard.writeText(v); } catch (_) { $("#link").select(); document.execCommand("copy"); }

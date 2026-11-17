@@ -126,6 +126,7 @@
     $("#orderTitle").textContent = p.titulo;
     $("#orderPrice").textContent = p.preco != null ? brl(p.preco) : "Valor sob consulta";
     $("#orderAddon").checked = false;
+    limparCupom(); $("#orderCupom").value = "";
     $("#orderDesc").textContent = p.desc || "";
     $("#orderItems").innerHTML = p.itens.map((i) => `<li>${esc(i)}</li>`).join("");
     $("#formError").textContent = "";
@@ -160,9 +161,40 @@
   const addon = L.adicional;
   if (addon) $("#orderAddonPrice").textContent = `+${brl(addon.preco)}`;
   else $("#orderAddon").closest("label").hidden = true;
-  $("#orderAddon").addEventListener("change", (e) => {
-    if (atual && atual.preco != null) $("#orderPrice").textContent = brl(atual.preco + (e.target.checked && addon ? addon.preco : 0));
-  });
+  $("#orderAddon").addEventListener("change", atualizarPreco);
+
+  /* cupom: o servidor confere e informa o desconto (o adicional não tem desconto) */
+  let cupom = null; // { codigo, desconto, rotulo }
+  const precoTotal = () => atual.preco - (cupom ? cupom.desconto : 0) + ($("#orderAddon").checked && addon ? addon.preco : 0);
+  function atualizarPreco() {
+    if (!atual || atual.preco == null) return;
+    const el = $("#orderPrice");
+    el.textContent = brl(precoTotal());
+    if (cupom) el.insertAdjacentHTML("afterbegin", `<s>${brl(precoTotal() + cupom.desconto)}</s>`);
+  }
+  function limparCupom(msg = "", erro = false) {
+    cupom = null;
+    const m = $("#orderCupomMsg"); m.textContent = msg; m.className = "cupom__msg" + (msg ? (erro ? " is-err" : " is-ok") : "");
+    atualizarPreco();
+  }
+  async function aplicarCupom() {
+    const codigo = $("#orderCupom").value.trim();
+    if (!codigo) { limparCupom(); return; }
+    const btn = $("#orderCupomBtn"); btn.disabled = true;
+    try {
+      const r = await fetch("/api/cupom", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ codigo, produto: atual.id, token: atual.token }) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) { limparCupom(j.erro || "Cupom inválido.", true); return; }
+      cupom = j;
+      $("#orderCupom").value = j.codigo;
+      const m = $("#orderCupomMsg"); m.textContent = `Cupom ${j.codigo} aplicado: ${j.rotulo} (−${brl(j.desconto)})`; m.className = "cupom__msg is-ok";
+      atualizarPreco();
+    } catch (_) { limparCupom("Não foi possível conferir o cupom agora.", true); }
+    finally { btn.disabled = false; }
+  }
+  $("#orderCupomBtn").addEventListener("click", aplicarCupom);
+  $("#orderCupom").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); aplicarCupom(); } });
+  $("#orderCupom").addEventListener("input", () => { if (cupom) limparCupom(); });
 
   $("#orderAccept").addEventListener("change", (e) => ($("#orderSend").disabled = !e.target.checked));
 
@@ -187,7 +219,7 @@
     const btn = $("#orderSend");
     btn.disabled = true; btn.textContent = "Gerando Pix…";
     try {
-      cobranca = await Pay.criar({ produto: atual.id, plataforma, nick, nome, email, telefone, cpf, adicional: !!(addon && $("#orderAddon").checked), token: atual.token, aceiteTermos: true });
+      cobranca = await Pay.criar({ produto: atual.id, plataforma, nick, nome, email, telefone, cpf, adicional: !!(addon && $("#orderAddon").checked), token: atual.token, cupom: cupom ? cupom.codigo : undefined, aceiteTermos: true });
       cobranca.produto = atual.id;
       cobranca.titulo = atual.titulo; cobranca.cor = atual.cor;
       pendente.salvar({ id: cobranca.id, produto: atual.id, titulo: atual.titulo, cor: atual.cor, t: Date.now() });
@@ -221,7 +253,7 @@
   });
 
   async function mostrarPix(c) {
-    $("#pixAmount").textContent = brl(c.valor != null ? c.valor : atual.preco + ($("#orderAddon").checked && addon ? addon.preco : 0));
+    $("#pixAmount").textContent = brl(c.valor != null ? c.valor : precoTotal());
     $("#pixCode").value = c.copiaECola || "";
     const box = $("#pixQr");
     if (c.qrCodeBase64) {

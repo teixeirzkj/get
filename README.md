@@ -42,6 +42,13 @@ Depois de mudar variáveis, faça **Redeploy**.
 - Os ids dos pacotes não mudam (são os nomes dos PDFs em `arquivos/`).
 - Quem editar o código localmente deve dar `git pull` antes, para pegar as alterações feitas pelo painel.
 
+## Cupons (`/admin` → Cupons)
+- Ficam em `cupons.json` (raiz, fora de `public/`): os códigos não aparecem no site.
+- Cada cupom: código, % do pacote ou R$ fixo, validade (opcional), pacote (ou todos) e ativo.
+- O checkout confere em `/api/cupom`; o desconto é recalculado em `/api/pagamento` e vai no ID da transação, então status e download conferem o valor com desconto.
+- O desconto vale sobre o pacote (não sobre o adicional) e o Pix nunca fica abaixo de R$ 5,00.
+- Sem limite de usos por cupom (o site não tem banco de dados): desative o cupom quando quiser encerrar.
+
 ## Pacotes personalizados (`/admin`)
 - Abra `/admin`, digite a senha (`ADMIN_SENHA`), monte o pacote (título, itens, preço, arquivo entregue) e gere o link.
 - O link (`/pedido?c=...`) é assinado: o cliente não consegue mudar preço nem itens. Vale pelos dias escolhidos.

@@ -41,14 +41,16 @@ async function cashinpay(metodo, rota, body) {
 
 // ID da transação gerado por nós: tx_<produto>_[sup_]<carimbo>. O produto e o adicional saem do
 // próprio ID, então o servidor sabe o que foi comprado (e o valor certo) sem banco de dados.
-function novoId(produto, comAdicional) {
+// Com cupom, o desconto (em centavos) também vai no ID: tx_<produto>_[sup_][c<centavos>_]<carimbo>.
+function novoId(produto, comAdicional, descontoCentavos) {
   const rand = require("crypto").randomBytes(5).toString("hex");
-  return `tx_${produto}_${comAdicional ? "sup_" : ""}${Date.now().toString(36)}${rand}`;
+  const cup = descontoCentavos > 0 ? `c${descontoCentavos}_` : "";
+  return `tx_${produto}_${comAdicional ? "sup_" : ""}${cup}${Date.now().toString(36)}${rand}`;
 }
 // Pacote personalizado: produto no ID = p<centavos>-<arquivo> (arquivo = id de um pacote ou "suporte").
 // Esse ID só é criado pelo servidor depois de conferir o link assinado pelo admin.
 function pedidoDoId(id) {
-  const m = /^tx_([a-z0-9-]+)_(sup_)?[a-z0-9]{8,30}$/.exec(String(id || ""));
+  const m = /^tx_([a-z0-9-]+)_(sup_)?(?:c(\d{1,7})_)?[a-z0-9]{8,30}$/.exec(String(id || ""));
   if (!m) return null;
   let item, arquivo;
   const pers = /^p(\d{1,7})-([a-z0-9-]+)$/.exec(m[1]);
@@ -63,7 +65,8 @@ function pedidoDoId(id) {
   if (!item) return null;
   const extra = m[2] ? precoAdicional() : 0;
   if (extra == null) return null;
-  return { produto: m[1], arquivo, item, adicional: !!m[2], valor: Math.round((item.preco + extra) * 100) / 100 };
+  const desconto = m[3] ? Number(m[3]) / 100 : 0;
+  return { produto: m[1], arquivo, item, adicional: !!m[2], desconto, valor: Math.round((item.preco - desconto + extra) * 100) / 100 };
 }
 
 // ---------- links de pacote personalizado (assinados, sem banco de dados) ----------
@@ -91,6 +94,46 @@ function lerToken(token) {
     return d;
   } catch (_) { return null; }
 }
+// ---------- cupons de desconto ----------
+// Lista em cupons.json (raiz do projeto, não é pública). Editada pelo /admin → Cupons.
+// { codigo, tipo: "percentual"|"valor", valor, ativo, validade: "AAAA-MM-DD"|"", pacotes: [] (vazio = todos) }
+const PRECO_MINIMO = 5; // o Pix nunca fica abaixo disso, mesmo com cupom
+const normCodigo = (c) => String(c || "").trim().toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 20);
+function lerCupons() {
+  try { return JSON.parse(fs.readFileSync(path.join(process.cwd(), "cupons.json"), "utf8")).cupons || []; }
+  catch (_) { return []; }
+}
+const hojeBR = () => new Date().toLocaleDateString("sv-SE", { timeZone: "America/Sao_Paulo" }); // AAAA-MM-DD
+// chave = id do pacote ou "personalizado"; base = preço do pacote (o adicional não tem desconto)
+function aplicarCupom(codigo, chave, base) {
+  const cod = normCodigo(codigo);
+  const c = cod && lerCupons().find((x) => normCodigo(x.codigo) === cod);
+  if (!c || !c.ativo) return { erro: "Cupom inválido." };
+  if (c.validade && hojeBR() > c.validade) return { erro: "Este cupom expirou." };
+  if (Array.isArray(c.pacotes) && c.pacotes.length && !c.pacotes.includes(chave)) return { erro: "Este cupom não vale para este pacote." };
+  let desconto = c.tipo === "valor" ? Number(c.valor) : (base * Number(c.valor)) / 100;
+  desconto = Math.min(Math.round(desconto * 100) / 100, Math.round((base - PRECO_MINIMO) * 100) / 100);
+  if (!(desconto > 0)) return { erro: "Este cupom não se aplica a este valor." };
+  const rotulo = c.tipo === "valor" ? `R$ ${Number(c.valor).toFixed(2).replace(".", ",")} de desconto` : `${Number(c.valor)}% de desconto`;
+  return { codigo: cod, desconto, rotulo };
+}
+
+// ---------- GitHub (painel salva arquivos do repositório; a Vercel publica sozinha) ----------
+async function github(metodo, rota, body) {
+  const token = process.env.GITHUB_TOKEN;
+  if (!token) throw Object.assign(new Error("GITHUB_TOKEN não configurado"), { status: 503, code: "sem_github" });
+  const repo = process.env.GITHUB_REPO || "teixeirzkj/get";
+  const r = await fetch(`https://api.github.com/repos/${repo}${rota}`, {
+    method: metodo,
+    headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json", "User-Agent": "teixeiramods-admin", ...(body ? { "Content-Type": "application/json" } : {}) },
+    body: body ? JSON.stringify(body) : undefined,
+    signal: AbortSignal.timeout(20000),
+  });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw Object.assign(new Error(`GitHub ${r.status}: ${j.message || ""}`), { status: r.status, code: "github" });
+  return j;
+}
+
 function senhaAdminOk(senha) {
   const certa = process.env.ADMIN_SENHA;
   if (!certa) throw Object.assign(new Error("ADMIN_SENHA não configurada"), { status: 503, code: "nao_configurado" });
@@ -125,4 +168,4 @@ const pago = (s) => ["paid", "approved", "completed", "confirmed"].includes(Stri
 const mesmoValor = (a, b) => Math.abs(Number(a) - Number(b)) < 0.005;
 const valorDe = (amount) => (amount && typeof amount === "object" ? amount.value : amount);
 
-module.exports = { produtos, precoAdicional, cashinpay, novoId, pedidoDoId, assinar, lerToken, senhaAdminOk, arquivoDoProduto, linkDownload, pago, mesmoValor, valorDe };
+module.exports = { produtos, precoAdicional, cashinpay, novoId, pedidoDoId, assinar, lerToken, senhaAdminOk, aplicarCupom, normCodigo, github, arquivoDoProduto, linkDownload, pago, mesmoValor, valorDe };

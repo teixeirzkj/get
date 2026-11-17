@@ -1,7 +1,7 @@
 // POST /api/loja → (admin) salva preços e textos da loja em public/config.js, direto no GitHub.
 // A Vercel publica o novo commit sozinha (~1 min). body: { senha, dados }
 // Só campos conhecidos são aceitos; ids dos pacotes não mudam (são os nomes dos PDFs em arquivos/).
-const { senhaAdminOk } = require("./_lib");
+const { senhaAdminOk, github } = require("./_lib");
 
 const ARQUIVO = "public/config.js";
 const MARCA = /window\.LOJA = \/\*DADOS\*\/([\s\S]*)\/\*FIM\*\//;
@@ -74,21 +74,6 @@ function mesclar(atual, d) {
     };
   });
   return novo;
-}
-
-async function github(metodo, rota, body) {
-  const token = process.env.GITHUB_TOKEN;
-  if (!token) throw Object.assign(new Error("GITHUB_TOKEN não configurado"), { status: 503, code: "sem_github" });
-  const repo = process.env.GITHUB_REPO || "teixeirzkj/get";
-  const r = await fetch(`https://api.github.com/repos/${repo}${rota}`, {
-    method: metodo,
-    headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json", "User-Agent": "teixeiramods-admin", ...(body ? { "Content-Type": "application/json" } : {}) },
-    body: body ? JSON.stringify(body) : undefined,
-    signal: AbortSignal.timeout(20000),
-  });
-  const j = await r.json().catch(() => ({}));
-  if (!r.ok) throw Object.assign(new Error(`GitHub ${r.status}: ${j.message || ""}`), { status: r.status, code: "github" });
-  return j;
 }
 
 module.exports = async (req, res) => {

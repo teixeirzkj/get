@@ -263,6 +263,12 @@ button { font: inherit; color: inherit; cursor: pointer; background: none; borde
 .terms__body h4 { margin: 14px 0 4px; font-size: 13px; color: var(--text); }
 .terms__body p { margin: 0; }
 .accept { display: flex; gap: 10px; align-items: flex-start; margin: 0 0 14px; font-size: 13px; line-height: 1.45; color: #c8c9d6; cursor: pointer; }
+.cupom { margin-bottom: 10px; }
+.cupom .copy input { text-transform: uppercase; }
+.cupom__msg { min-height: 18px; margin: 0; font-family: var(--body); font-size: 13px; letter-spacing: 0; text-transform: none; font-weight: 500; }
+.cupom__msg.is-ok { color: var(--money); }
+.cupom__msg.is-err { color: var(--red); }
+.order__price s { margin-right: 8px; font-size: .65em; color: var(--muted); font-weight: 500; }
 .accept--addon b { color: var(--c); }
 .accept input { flex: none; width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--money); cursor: pointer; }
 .form__error { margin: 0 0 10px; font-size: 13px; color: var(--red); }

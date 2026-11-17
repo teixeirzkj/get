@@ -53,6 +53,10 @@
     .savebar { position: sticky; bottom: 0; display: flex; align-items: center; justify-content: flex-end; gap: 16px; padding: 14px 0; background: linear-gradient(0deg, var(--bg) 70%, transparent); }
     .savebar .err, .savebar .ok { margin: 0; flex: 1; }
     .ok { font-size: 13px; color: var(--money); }
+    .cup { display: grid; grid-template-columns: 1.3fr .9fr .8fr 1fr 1.3fr auto auto; gap: 0 10px; align-items: end; padding-bottom: 6px; border-bottom: 1px solid var(--line); margin-bottom: 12px; }
+    .cup .accept { margin: 0 0 22px; white-space: nowrap; }
+    .cup__rm { margin-bottom: 14px; color: var(--red); font-size: 22px; padding: 0 6px; }
+    @media (max-width: 860px) { .cup { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 860px) { .adm__grid { grid-template-columns: 1fr; } .pesos, .ed__grid { grid-template-columns: 1fr 1fr; } .ed__grid--2 { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 520px) { .field-row { grid-template-columns: 1fr; } .box { padding: 20px 16px; } }
   </style>
@@ -69,6 +73,7 @@
     <div class="tabs" role="tablist">
       <button type="button" class="tab is-on" role="tab" aria-selected="true" data-aba="pers">Pacote personalizado</button>
       <button type="button" class="tab" role="tab" aria-selected="false" data-aba="loja">Editar loja</button>
+      <button type="button" class="tab" role="tab" aria-selected="false" data-aba="cupons">Cupons</button>
     </div>
 
     <div class="adm__grid aba" data-aba="pers">
@@ -160,6 +165,25 @@
         <p class="err" id="eErr" role="alert"></p>
         <p class="ok" id="eOk" role="status"></p>
         <button class="btn btn--primary btn--lg" id="salvar" type="submit">Salvar alterações</button>
+      </div>
+    </form>
+
+    <!-- CUPONS (salva cupons.json no GitHub; os códigos não ficam públicos) -->
+    <form class="aba" data-aba="cupons" id="cupons" novalidate hidden>
+      <section class="box">
+        <h2>Cupons de desconto</h2>
+        <p class="hint" style="margin:-6px 0 16px">O desconto vale sobre o preço do pacote (o adicional não tem desconto) e o Pix nunca fica abaixo de R$ 5,00. Os códigos não aparecem no site.</p>
+        <div id="cLista"></div>
+        <p class="hint" id="cVazio" hidden>Nenhum cupom ainda.</p>
+        <div class="out__btns" style="margin-top:14px">
+          <button type="button" class="btn btn--line" id="cCarregar">Carregar cupons</button>
+          <button type="button" class="btn btn--line" id="cNovo">+ Novo cupom</button>
+        </div>
+      </section>
+      <div class="savebar">
+        <p class="err" id="cErr" role="alert"></p>
+        <p class="ok" id="cOk" role="status"></p>
+        <button class="btn btn--primary btn--lg" id="cSalvar" type="submit">Salvar cupons</button>
       </div>
     </form>
   </main>

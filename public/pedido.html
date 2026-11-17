@@ -115,6 +115,14 @@
               <span>CPF</span>
               <input id="orderCpf" type="text" maxlength="14" placeholder="000.000.000-00" inputmode="numeric" autocomplete="off" required />
             </label>
+            <div class="field cupom">
+              <span>Cupom de desconto</span>
+              <div class="copy">
+                <input id="orderCupom" type="text" maxlength="20" placeholder="Tem um cupom?" autocomplete="off" autocapitalize="characters" />
+                <button type="button" class="btn btn--line" id="orderCupomBtn">Aplicar</button>
+              </div>
+              <p class="cupom__msg" id="orderCupomMsg" role="status"></p>
+            </div>
             <label class="accept accept--addon">
               <input type="checkbox" id="orderAddon" />
               <span>Adicional <b id="orderAddonPrice"></b></span>

@@ -1,6 +1,6 @@
 // POST /api/pagamento     → cria a cobrança Pix na CashinPay
 // GET  /api/pagamento?id= → consulta o status (e libera o download quando pago)
-const { produtos, precoAdicional, cashinpay, novoId, pedidoDoId, lerToken, linkDownload, pago, mesmoValor, valorDe } = require("./_lib");
+const { produtos, precoAdicional, cashinpay, novoId, pedidoDoId, lerToken, aplicarCupom, linkDownload, pago, mesmoValor, valorDe } = require("./_lib");
 
 const PLATAFORMAS = ["Steam", "Epic Games", "Rockstar Launcher", "Xbox App (PC)", "Xbox Series / One", "PS4", "PS5"];
 
@@ -60,12 +60,18 @@ async function criar(req, res) {
 
   const extra = b.adicional === true ? precoAdicional() : 0;
   if (extra == null) return res.status(400).json({ erro: "Adicional indisponível." });
-  const valor = Math.round((item.preco + extra) * 100) / 100; // preço sempre do servidor
-  const id = novoId(idProduto, extra > 0);
+  let desconto = 0, cupom = "";
+  if (b.cupom) {
+    const c = aplicarCupom(b.cupom, b.produto === "personalizado" ? "personalizado" : b.produto, item.preco);
+    if (c.erro) return res.status(400).json({ erro: c.erro });
+    desconto = c.desconto; cupom = c.codigo;
+  }
+  const valor = Math.round((item.preco - desconto + extra) * 100) / 100; // preço sempre do servidor
+  const id = novoId(idProduto, extra > 0, Math.round(desconto * 100));
   const tx = await cashinpay("POST", "/transactions", {
     amount: valor,
     transaction_id: id,
-    description: `Teixeira Mods | ${item.nome}${extra ? " + Adicional" : ""} | ${b.plataforma} | ${nick}`.slice(0, 140),
+    description: `Teixeira Mods | ${item.nome}${extra ? " + Adicional" : ""}${cupom ? ` | Cupom ${cupom}` : ""} | ${b.plataforma} | ${nick}`.slice(0, 140),
     customer: { name: nome, email, phone: telefone, document: cpf },
   });
 
