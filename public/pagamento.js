@@ -1,7 +1,7 @@
 // =====================================================================
 //  CLIENTE DE PAGAMENTO (Pix via gateway)
 //
-//  Gateway: CashinPay (implementado em /api). O site conversa só com a SUA API (LOJA.pagamento.endpoint). A API é
+//  Gateway: PagueZy (implementado em /api). O site conversa só com a SUA API (LOJA.pagamento.endpoint). A API é
 //  quem fala com o gateway, guarda a chave secreta e decide o preço pelo
 //  id do produto. Contrato esperado:
 //

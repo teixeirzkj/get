@@ -259,6 +259,8 @@
     if (c.qrCodeBase64) {
       const src = c.qrCodeBase64.startsWith("data:") ? c.qrCodeBase64 : `data:image/png;base64,${c.qrCodeBase64}`;
       box.innerHTML = `<img src="${src}" alt="QR Code Pix" />`;
+    } else if (!c.copiaECola && c.pagamentoUrl) {
+      box.innerHTML = `<a class="btn btn--primary" href="${esc(c.pagamentoUrl)}" target="_blank" rel="noopener">Abrir Pix</a>`;
     } else if (c.copiaECola) {
       box.innerHTML = "";
       try { await loadQrLib(); new window.QRCode(box, { text: c.copiaECola, width: 200, height: 200, correctLevel: window.QRCode.CorrectLevel.M }); }
@@ -309,7 +311,10 @@
         if (modal.classList.contains("is-open")) mostrarErro("Pix expirado", "O tempo para pagamento acabou. Gere um novo Pix.");
         cobranca = null;
       }
-    } catch (_) { /* tenta de novo no próximo ciclo */ }
+    } catch (e) {
+      if (e.status === 400) { pararStatus(); pendente.limpar(); cobranca = null; } // cobrança que não existe mais
+      /* outros erros: tenta de novo no próximo ciclo */
+    }
     finally { checando = false; }
   }
   function iniciarStatus() {

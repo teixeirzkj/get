@@ -1,6 +1,6 @@
-// POST /api/pagamento     → cria a cobrança Pix na CashinPay
+// POST /api/pagamento     → cria a cobrança Pix na PagueZy
 // GET  /api/pagamento?id= → consulta o status (e libera o download quando pago)
-const { produtos, precoAdicional, cashinpay, novoId, pedidoDoId, lerToken, aplicarCupom, linkDownload, pago, mesmoValor, valorDe } = require("./_lib");
+const { produtos, precoAdicional, paguezy, juntarId, consultarPagamento, novoId, lerToken, aplicarCupom, linkDownload } = require("./_lib");
 
 const PLATAFORMAS = ["Steam", "Epic Games", "Rockstar Launcher", "Xbox App (PC)", "Xbox Series / One", "PS4", "PS5"];
 
@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
   } catch (e) {
     console.error("[pagamento]", e.status, e.code, e.message);
     if (e.code === "nao_configurado") return res.status(503).json({ erro: "Pagamento indisponível no momento. Chame o suporte no Discord.", code: e.code });
-    // erros de validação da CashinPay (4xx) podem ser mostrados ao cliente
+    // erros de validação do gateway (4xx) podem ser mostrados ao cliente
     if (e.status >= 400 && e.status < 500 && e.status !== 401 && e.status !== 403) return res.status(400).json({ erro: e.message });
     return res.status(502).json({ erro: "Não foi possível processar o pagamento agora. Tente novamente." });
   }
@@ -68,34 +68,31 @@ async function criar(req, res) {
   }
   const valor = Math.round((item.preco - desconto + extra) * 100) / 100; // preço sempre do servidor
   const id = novoId(idProduto, extra > 0, Math.round(desconto * 100));
-  const tx = await cashinpay("POST", "/transactions", {
-    amount: valor,
-    transaction_id: id,
-    description: `Teixeira Mods | ${item.nome}${extra ? " + Adicional" : ""}${cupom ? ` | Cupom ${cupom}` : ""} | ${b.plataforma} | ${nick}`.slice(0, 140),
-    customer: { name: nome, email, phone: telefone, document: cpf },
+  const d = await paguezy("POST", "/payments", {
+    amount: Math.round(valor * 100), // centavos
+    payment_method: "pix",
+    external_reference: id,
+    customer: { name: nome, email, document: cpf, phone: telefone },
   });
+  const pid = d.id || d.transaction_id || d.trx_uuid;
+  const copiaECola = d.pix_copy_paste || (d.pix && (d.pix.copy_paste || d.pix.qrcode)) || d.pix_code;
+  if (!pid || !(copiaECola || d.payment_url)) throw Object.assign(new Error("Resposta da PagueZy sem id/Pix"), { status: 502 });
+  console.log("[pagamento] criado", id, pid, `${b.plataforma} | ${nick}${cupom ? ` | cupom ${cupom}` : ""}`);
 
-  const pix = tx.pix || {};
   return res.status(200).json({
-    id, // consultas usam o nosso transaction_id
-    copiaECola: pix.copy_paste || pix.qrcode,
-    valor: valorDe(tx.amount) ?? valor,
+    id: juntarId(id, pid),
+    copiaECola,
+    pagamentoUrl: d.payment_url ? new URL(d.payment_url, "https://paguezy.com").href : undefined,
+    valor,
   });
 }
 
 async function consultar(req, res) {
   const id = String((req.query || {}).id || "");
-  const pedido = pedidoDoId(id);
-  if (!pedido) return res.status(400).json({ erro: "Consulta inválida." });
-  const { arquivo } = pedido;
-
-  const tx = await cashinpay("GET", `/transactions/${encodeURIComponent(id)}`);
-
-  if (pago(tx.status)) {
-    // confere se o valor pago é o do produto
-    if (!mesmoValor(valorDe(tx.amount), pedido.valor)) return res.status(403).json({ erro: "Pagamento não corresponde ao produto." });
-    return res.status(200).json({ status: "paid", downloadUrl: linkDownload(arquivo, id) });
-  }
-  if (tx.status === "expired" || tx.status === "cancelled") return res.status(200).json({ status: "expired" });
+  const r = await consultarPagamento(id);
+  if (!r) return res.status(400).json({ erro: "Consulta inválida." });
+  if (r.status === "paid") return res.status(200).json({ status: "paid", downloadUrl: linkDownload(r.pedido.arquivo, id) });
+  if (r.status === "invalido") return res.status(403).json({ erro: "Pagamento não corresponde ao produto." });
+  if (r.status === "expired" || r.status === "estornado") return res.status(200).json({ status: "expired" });
   return res.status(200).json({ status: "pending" });
 }

@@ -3,7 +3,8 @@ const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
 
-const CASHINPAY = "https://api.cashinpaybr.com/api/v1";
+// Gateway Pix: PagueZy (https://paguezy.com/docs/guia). Chaves pk_test_/sk_test_ = sandbox no mesmo host.
+const PAGUEZY = process.env.PAGUEZY_URL || "https://paguezy.com/api/v1";
 
 // Lê o catálogo do mesmo config.js usado pelo site (fonte única de preços)
 let catalogo;
@@ -22,21 +23,50 @@ function produtos() {
 let adicional;
 function precoAdicional() { produtos(); return adicional ? adicional.preco : null; }
 
-async function cashinpay(metodo, rota, body) {
-  const key = process.env.CASHINPAY_API_KEY;
-  if (!key) throw Object.assign(new Error("CASHINPAY_API_KEY não configurada"), { status: 503, code: "nao_configurado" });
-  const r = await fetch(CASHINPAY + rota, {
+async function paguezy(metodo, rota, body) {
+  const key = process.env.PAGUEZY_API_KEY, secret = process.env.PAGUEZY_API_SECRET;
+  if (!key || !secret) throw Object.assign(new Error("PAGUEZY_API_KEY / PAGUEZY_API_SECRET não configuradas"), { status: 503, code: "nao_configurado" });
+  const r = await fetch(PAGUEZY + rota, {
     method: metodo,
-    headers: { Authorization: `Bearer ${key}`, Accept: "application/json", ...(body ? { "Content-Type": "application/json" } : {}) },
+    headers: { "X-Api-Key": key, "X-Api-Secret": secret, Accept: "application/json", ...(body ? { "Content-Type": "application/json" } : {}) },
     body: body ? JSON.stringify(body) : undefined,
     signal: AbortSignal.timeout(20000),
   });
-  const json = await r.json().catch(() => ({}));
-  if (!r.ok || json.success === false) {
-    const err = json.error || {};
-    throw Object.assign(new Error(err.message || `CashinPay HTTP ${r.status}`), { status: r.status, code: err.code });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok || j.success === false) {
+    const msg = j.message || (j.error && (j.error.message || (typeof j.error === "string" && j.error))) || j.erro;
+    throw Object.assign(new Error(msg || `PagueZy HTTP ${r.status}`), { status: r.status, code: j.error && j.error.code });
   }
-  return json.data || {};
+  return j.data || j.payment || j;
+}
+
+// O ID da cobrança é da PagueZy; o nosso (tx_..., com produto/valor) vai como external_reference.
+// O navegador recebe os dois juntos: "<nosso id>.<id PagueZy>".
+const juntarId = (tx, pid) => `${tx}.${pid}`;
+function separarId(s) {
+  const i = String(s || "").indexOf(".");
+  if (i < 0) return null;
+  const tx = s.slice(0, i), pid = s.slice(i + 1);
+  return /^[A-Za-z0-9_-]{4,100}$/.test(pid) ? { tx, pid } : null;
+}
+
+// Consulta na PagueZy e confere referência e valor. status: paid | pending | expired | estornado | invalido
+async function consultarPagamento(idComposto) {
+  const partes = separarId(idComposto);
+  const pedido = partes && pedidoDoId(partes.tx);
+  if (!pedido) return null;
+  const d = await paguezy("GET", `/payments/${encodeURIComponent(partes.pid)}`);
+  const ref = d.external_reference ?? d.externalReference;
+  if (ref != null && ref !== partes.tx) return { pedido, status: "invalido" };
+  const st = String(d.status || "").toLowerCase();
+  if (st === "paid") {
+    const amt = Number(d.amount ?? d.value);
+    const ok = amt === Math.round(pedido.valor * 100) || mesmoValor(amt, pedido.valor); // centavos (doc) ou reais
+    return { pedido, status: ok ? "paid" : "invalido" };
+  }
+  if (["failed", "canceled", "cancelled", "expired"].includes(st)) return { pedido, status: "expired" };
+  if (["refunded", "chargeback"].includes(st)) return { pedido, status: "estornado" };
+  return { pedido, status: "pending" };
 }
 
 // ID da transação gerado por nós: tx_<produto>_[sup_]<carimbo>. O produto e o adicional saem do
@@ -97,7 +127,7 @@ function lerToken(token) {
 // ---------- cupons de desconto ----------
 // Lista em cupons.json (raiz do projeto, não é pública). Editada pelo /admin → Cupons.
 // { codigo, tipo: "percentual"|"valor", valor, ativo, validade: "AAAA-MM-DD"|"", pacotes: [] (vazio = todos) }
-const PRECO_MINIMO = 5; // o Pix nunca fica abaixo disso, mesmo com cupom
+const PRECO_MINIMO = 5; // o Pix nunca fica abaixo disso, mesmo com cupom (margem segura para o gateway)
 const normCodigo = (c) => String(c || "").trim().toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 20);
 function lerCupons() {
   try { return JSON.parse(fs.readFileSync(path.join(process.cwd(), "cupons.json"), "utf8")).cupons || []; }
@@ -163,9 +193,6 @@ function linkDownload(arquivo, txId) {
   return linkExterno(arquivo);
 }
 
-// status que a CashinPay pode usar para "pago"
-const pago = (s) => ["paid", "approved", "completed", "confirmed"].includes(String(s || "").toLowerCase());
 const mesmoValor = (a, b) => Math.abs(Number(a) - Number(b)) < 0.005;
-const valorDe = (amount) => (amount && typeof amount === "object" ? amount.value : amount);
 
-module.exports = { produtos, precoAdicional, cashinpay, novoId, pedidoDoId, assinar, lerToken, senhaAdminOk, aplicarCupom, normCodigo, github, arquivoDoProduto, linkDownload, pago, mesmoValor, valorDe };
+module.exports = { produtos, precoAdicional, paguezy, juntarId, consultarPagamento, novoId, pedidoDoId, assinar, lerToken, senhaAdminOk, aplicarCupom, normCodigo, github, arquivoDoProduto, linkDownload, mesmoValor };
